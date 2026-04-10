@@ -78,21 +78,18 @@
     background: radial-gradient(ellipse 80% 60% at 50% 60%, rgba(107,91,158,0.2) 0%, transparent 70%);
   }
 
-  
-
   .header-title {
     font-size: 15px;
     font-weight: 1000;
   }
 
-  @media screen and ( max-width: 768px ) {
+  @media screen and (max-width: 768px) {
     .header-title {
       font-size: 10px;
       font-weight: 800;
     }
-
     .header-div {
-      gap: 20px
+      gap: 20px;
     }
   }
 
@@ -105,12 +102,6 @@
     opacity: 0;
     animation: fadeUp 1.2s 0.4s forwards;
     margin-bottom: 1.5rem;
-  }
-
-  @media screen and ( max-widt: 768px ) {
-    .hero-eyebrow {
-      margin-bottom: 20px;
-    }
   }
 
   .hero-title {
@@ -138,7 +129,7 @@
   .hero-date {
     font-family: 'Cinzel', serif;
     font-size: 0.85rem;
-    font-weight: 600 ;
+    font-weight: 600;
     letter-spacing: 0.3em;
     color: var(--gold);
     margin-top: 2.5rem;
@@ -324,7 +315,6 @@
     transition: transform 0.6s;
     display: block;
   }
-
   .gallery-card:hover img { transform: scale(1.05); }
 
   .gallery-card .photo-placeholder {
@@ -344,8 +334,6 @@
     font-size: 2rem;
     opacity: 0.5;
   }
-
-
 
   /* ── LETTERS ── */
   #letters { padding: 4rem 0 6rem; }
@@ -407,7 +395,6 @@
     opacity: 0.85;
   }
 
-  /* Add letter button */
   .add-letter-btn {
     display: flex;
     align-items: center;
@@ -535,7 +522,7 @@
     border-top: 1px solid rgba(200,169,110,0.08);
   }
   footer .big-msg {
-    font-family: 'Lucida Handwriting';
+    font-family: 'Lucida Handwriting', cursive;
     font-size: clamp(2rem, 5vw, 3.5rem);
     color: var(--star-white);
     opacity: 0.9;
@@ -614,15 +601,158 @@
     .timeline-item:nth-child(even) .tl-empty { display: none; }
     .tl-dot { grid-column: 1; }
   }
+
+  /* ── CONFETTI OVERLAY (blocks all page content) ── */
+  #confetti-overlay {
+    position: fixed; inset: 0;
+    background: var(--deep);
+    z-index: 990;
+    opacity: 1;
+    transition: opacity 0.8s ease;
+    pointer-events: none;
+  }
+  #confetti-overlay.fade-out {
+    opacity: 0;
+  }
+
+  /* ── CONFETTI CANVAS ── */
+  #confetti-canvas {
+    position: fixed; inset: 0;
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  /* ── ANNIVERSARY TOAST ── */
+  #anni-toast {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    background: rgba(6,6,26,0.0);
+    text-align: center;
+    z-index: 1000;
+    pointer-events: none;
+    transition: transform 0.55s cubic-bezier(0.34,1.56,0.64,1), opacity 0.6s;
+  }
+  #anni-toast.show { transform: translate(-50%, -50%) scale(1); }
+  #anni-toast.hide { opacity: 0; transform: translate(-50%, -55%) scale(0.9); }
+
+  #anni-toast .toast-small {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(0.45rem, 2.5vw, 0.75rem);
+    letter-spacing: clamp(0.15em, 1vw, 0.45em);
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: clamp(0.4rem, 1.5vw, 0.8rem);
+    opacity: 0.85;
+    white-space: nowrap;
+  }
+  #anni-toast .toast-line1 {
+    font-family: 'Sacramento', cursive;
+    font-size: clamp(2.8rem, 16vw, 7rem);
+    color: var(--star-white);
+    line-height: 0.95;
+    text-shadow: 0 0 60px rgba(200,169,110,0.5), 0 0 120px rgba(107,91,158,0.3);
+    display: block;
+  }
+  #anni-toast .toast-line2 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(0.85rem, 5vw, 2rem);
+    font-weight: 600;
+    letter-spacing: clamp(0.1em, 1vw, 0.25em);
+    color: var(--gold);
+    text-transform: uppercase;
+    display: block;
+    margin-top: 0.2rem;
+    text-shadow: 0 0 30px rgba(200,169,110,0.4);
+  }
+  #anni-toast .toast-line3 {
+    font-family: 'Sacramento', cursive;
+    font-size: clamp(1.8rem, 10vw, 3.5rem);
+    color: var(--star-white);
+    display: block;
+    margin-top: 0.1rem;
+    line-height: 1.1;
+    text-shadow: 0 0 40px rgba(200,169,110,0.4);
+  }
+  #anni-toast .toast-hearts {
+    font-size: clamp(0.9rem, 3vw, 1.2rem);
+    margin-top: clamp(0.5rem, 2vw, 1rem);
+    letter-spacing: clamp(0.3rem, 2vw, 0.6rem);
+    color: var(--rose);
+    display: block;
+    animation: pulse-hearts 1.5s infinite;
+  }
+
+  @media (max-width: 480px) {
+    #anni-toast {
+      width: 90vw;
+      padding: 0 1rem;
+    }
+    #anni-toast .toast-small {
+      font-size: 0.82rem;
+      margin-bottom: 80px;
+      letter-spacing: 0.12em;
+      white-space: normal;
+      line-height: 1.6;
+    }
+
+    #anni-toast .toast-line1 {
+      margin-top: 10px;
+    }
+
+    #anni-toast .toast-line2 {
+      margin-top: 20px;
+    }
+  }
+
+  /* Hero content hidden initially, revealed after confetti */
+  #hero .hero-eyebrow,
+  #hero .hero-title,
+  #hero .hero-sub,
+  #hero .hero-date,
+  #hero .scroll-hint {
+    animation: none !important;
+    opacity: 0;
+  }
+  #hero.revealed .hero-eyebrow {
+    animation: fadeUp 1s 0.1s forwards !important;
+  }
+  #hero.revealed .hero-title {
+    animation: fadeUp 1s 0.35s forwards !important;
+  }
+  #hero.revealed .hero-sub {
+    animation: fadeUp 1s 0.6s forwards !important;
+  }
+  #hero.revealed .hero-date {
+    animation: fadeUp 1s 0.85s forwards !important;
+  }
+  #hero.revealed .scroll-hint {
+    animation: fadeIn 1s 1.3s forwards !important;
+  }
 </style>
 </head>
 <body>
 
-<!-- ── CANVAS ── -->
+<!-- ── STAR CANVAS ── -->
 <canvas id="starfield"></canvas>
 
+<!-- ── CONFETTI OVERLAY (hides all page content) ── -->
+<div id="confetti-overlay"></div>
+
+<!-- ── CONFETTI CANVAS ── -->
+<canvas id="confetti-canvas"></canvas>
+
+<!-- ── ANNIVERSARY TOAST ── -->
+<div id="anni-toast">
+  <span class="toast-small">✦ &nbsp; A Whole Year Together &nbsp; ✦</span>
+  <span class="toast-line1">Happy</span>
+  <span class="toast-line2">1 Year</span>
+  <span class="toast-line3">Anniversary</span>
+  <span class="toast-hearts">♡ &nbsp; ♡ &nbsp; ♡</span>
+</div>
+
 <!-- ── NAV ── -->
-<nav class="header-div" >
+<nav class="header-div">
   <a class="header-title" href="#hero">Home</a>
   <a class="header-title" href="#story">Our Story</a>
   <a class="header-title" href="#gallery">Gallery</a>
@@ -650,12 +780,11 @@
   </div>
   <div class="timeline" id="timeline-container">
 
-    <!-- ✏️ EDIT THESE TIMELINE ENTRIES -->
     <div class="timeline-item">
       <div class="tl-content">
         <p class="tl-date">The Beginning</p>
         <h3 class="tl-title">The Day We Met</h3>
-        <p class="tl-desc">It still amazes me the way we met, two strangers on an app, unaware that one simple conversation would turn into something so deep and meaningful. Those first few months weren’t just about knowing you, they were about feeling something I didn’t even realize I was missing. Every message from you became the best part of my day, and I found myself waiting for you without even noticing it. Our late night conversations became my comfort, and somehow, despite the distance, you felt closer than anyone around me. What made it even more special was how you were there through every part of your day, talking to me while you were on your way to work, in between your busy office hours, and again when you were heading back home. And even after all those conversations, it still felt like I could never have enough of you, like no matter how much we talked, my heart always wanted more..</p>
+        <p class="tl-desc">It still amazes me the way we met, two strangers on an app, unaware that one simple conversation would turn into something so deep and meaningful. Those first few months weren't just about knowing you, they were about feeling something I didn't even realize I was missing. Every message from you became the best part of my day, and I found myself waiting for you without even noticing it. Our late night conversations became my comfort, and somehow, despite the distance, you felt closer than anyone around me. What made it even more special was how you were there through every part of your day, talking to me while you were on your way to work, in between your busy office hours, and again when you were heading back home. And even after all those conversations, it still felt like I could never have enough of you, like no matter how much we talked, my heart always wanted more..</p>
       </div>
       <div class="tl-dot"><div class="tl-dot-inner"></div></div>
       <div class="tl-empty"></div>
@@ -667,8 +796,7 @@
       <div class="tl-content">
         <p class="tl-date">The Transitional Phase</p>
         <h3 class="tl-title">First "I Miss You"</h3>
-        <p class="tl-desc">Somewhere between the fourth and eighth month, everything began to feel more real like what we had was no longer just new and exciting, but something deeper, something steady and meaningful. You slowly became a part of my everyday life in the most natural way, like my days felt incomplete without you in them. We shared everything random conversations, deep talks, small arguments, even comfortable silences and through it all, I could feel us growing closer. I started understanding you in ways I never thought I would, noticing the smallest things about you your moods, your thoughts, the way you care. It wasn’t just about missing you anymore, it was about needing you, your presence, your voice, your energy. There were a few weeks that weren’t easy, when we tried to stay away from each other, and it hurt more than I can explain but even in that distance, we didn’t fall apart, we grew stronger. And that’s what makes this even more real that despite everything, we found our way back to each other, and here we are today.
-          .</p>
+        <p class="tl-desc">Somewhere between the fourth and eighth month, everything began to feel more real like what we had was no longer just new and exciting, but something deeper, something steady and meaningful. You slowly became a part of my everyday life in the most natural way, like my days felt incomplete without you in them. We shared everything random conversations, deep talks, small arguments, even comfortable silences and through it all, I could feel us growing closer. I started understanding you in ways I never thought I would, noticing the smallest things about you your moods, your thoughts, the way you care. It wasn't just about missing you anymore, it was about needing you, your presence, your voice, your energy. There were a few weeks that weren't easy, when we tried to stay away from each other, and it hurt more than I can explain but even in that distance, we didn't fall apart, we grew stronger. And that's what makes this even more real that despite everything, we found our way back to each other, and here we are today.</p>
       </div>
     </div>
 
@@ -676,34 +804,19 @@
       <div class="tl-content">
         <p class="tl-date">The Anniversary Phase</p>
         <h3 class="tl-title">Next Few Months</h3>
-        <p class="tl-desc">
-          And then came the last few month the ones that tested us in ways we never expected. We fought, we misunderstood each other, we tried to stay away, thinking maybe distance would make things easier but it never did. Instead, it only made us realize how much we truly meant to each other. There were nights filled with tears, moments of silence that felt heavier than words, and days where everything seemed uncertain. But even in all that pain, one thing never changed we never stopped caring, never stopped feeling, never truly let go. Somehow, through all the hurt and confusion, our hearts kept finding their way back to each other. And maybe that’s what makes us real. not that we never broke, but that even after breaking, we chose each other again and again.
-        </p>
+        <p class="tl-desc">And then came the last few month the ones that tested us in ways we never expected. We fought, we misunderstood each other, we tried to stay away, thinking maybe distance would make things easier but it never did. Instead, it only made us realize how much we truly meant to each other. There were nights filled with tears, moments of silence that felt heavier than words, and days where everything seemed uncertain. But even in all that pain, one thing never changed we never stopped caring, never stopped feeling, never truly let go. Somehow, through all the hurt and confusion, our hearts kept finding their way back to each other. And maybe that's what makes us real. not that we never broke, but that even after breaking, we chose each other again and again.</p>
       </div>
       <div class="tl-dot"><div class="tl-dot-inner"></div></div>
       <div class="tl-empty"></div>
     </div>
 
-    <!-- <div class="timeline-item">
-      <div class="tl-empty"></div>
-      <div class="tl-dot"><div class="tl-dot-inner"></div></div>
-      <div class="tl-content">
-        <p class="tl-date">Every Night</p>
-        <h3 class="tl-title">Goodnight Calls</h3>
-        <p class="tl-desc">The ritual that made two time zones feel like one heartbeat.</p>
-      </div>
-    </div> -->
-
     <div class="timeline-item">
       <div class="tl-content">
         <p class="tl-date">One Year</p>
         <h3 class="tl-title">Us, Still</h3>
-        <p class="tl-desc">
-          I know that you may never truly be mine in the way I’ve always imagined, I know that the life I dream of with you might never fully exist, and I understand the reality of everything we are facing. But even knowing all of that, I still choose you again and again because being with you, in whatever way I can, means everything to me. Every time I see you smile, it feels like I’ve achieved something meaningful in life. Every moment of peace we share makes me feel like the happiest person in the world. And I just wish that this feeling, this connection, never fades away.
-          <br>
-          <br>
-          Please never think that you aren’t giving me enough because you are giving me more than I could ever ask for. Your time, your care, your emotions… they mean more to me than anything else ever could. You make me feel complete in a way I never thought possible. And all I truly want is to keep that beautiful smile on your face for as long as I can, to protect the peace we’ve built together, and to hold onto this for as many years as life allows us.
-        </p>
+        <p class="tl-desc">I know that you may never truly be mine in the way I've always imagined, I know that the life I dream of with you might never fully exist, and I understand the reality of everything we are facing. But even knowing all of that, I still choose you again and again because being with you, in whatever way I can, means everything to me. Every time I see you smile, it feels like I've achieved something meaningful in life. Every moment of peace we share makes me feel like the happiest person in the world. And I just wish that this feeling, this connection, never fades away.
+          <br><br>
+          Please never think that you aren't giving me enough because you are giving me more than I could ever ask for. Your time, your care, your emotions… they mean more to me than anything else ever could. You make me feel complete in a way I never thought possible. And all I truly want is to keep that beautiful smile on your face for as long as I can, to protect the peace we've built together, and to hold onto this for as many years as life allows us.</p>
       </div>
       <div class="tl-dot"><div class="tl-dot-inner"></div></div>
       <div class="tl-empty"></div>
@@ -721,28 +834,21 @@
   </div>
   <div class="gallery-grid" id="gallery-grid">
 
-    <!-- Photo cards — click to upload a real photo -->
     <div class="gallery-card">
       <img src="/assets/Img-1.png" alt="Our first photo together" class="gallery-img">
-    </div>  
-
-    <div class="gallery-card">
-      <img src="/assets/img-2.png" alt="Our first photo together" class="gallery-img">
     </div>
-
     <div class="gallery-card">
-      <img src="/assets/img-3.png" alt="Our first photo together" class="gallery-img">
+      <img src="/assets/img-2.png" alt="Our second photo" class="gallery-img">
     </div>
-
     <div class="gallery-card">
-      <img src="/assets/img-4.png" alt="Our first photo together" class="gallery-img">
+      <img src="/assets/img-3.png" alt="Our third photo" class="gallery-img">
     </div>
-
     <div class="gallery-card">
-      <img src="/assets/img-5.png" alt="Our first photo together" class="gallery-img">
+      <img src="/assets/img-4.png" alt="Our fourth photo" class="gallery-img">
     </div>
-
-    
+    <div class="gallery-card">
+      <img src="/assets/img-5.png" alt="Our fifth photo" class="gallery-img">
+    </div>
 
   </div>
 </section>
@@ -756,15 +862,13 @@
   </div>
   <div class="letters-wrap">
 
-    <!-- ✏️ EDIT THESE LETTERS -->
     <div class="letter-card">
       <p class="letter-from">From Him — To Her ✦</p>
       <p class="letter-body">
         Every morning I wake up and the first thought that drifts into my mind is you.
         Not the idea of you, but the sound of your laugh, the way your eyes crinkle when something genuinely catches you off guard.
         The miles between us are real, but they have never once made me feel like you are far. You are the closest thing I know.
-          <br>
-          <br>
+          <br><br>
         Khwabo ki duniya mein hum Khote gye.<br>
         Hosh me the fir bhi madhosh hote gaye.<br>
         Jane kya jadu tha us ajnabi chehre mein.<br>
@@ -773,18 +877,7 @@
       <span class="letter-sign">— Always yours</span>
     </div>
 
-    <!-- <div class="letter-card" style="transition-delay: 0.15s">
-      <p class="letter-from">From Her — To Him ✦</p>
-      <p class="letter-body">
-        I never thought love could feel like a home you carry inside you — but here we are.
-        You taught me that distance is just geography. What we have lives somewhere no map can reach.
-        One year down, and I would choose this — choose you — a thousand times over.
-      </p>
-      <span class="letter-sign">— With all of me</span>
-    </div> -->
-
-    <!-- Dynamic letters added via button -->
-    <!-- <div id="extra-letters"></div> -->
+    <div id="extra-letters"></div>
 
   </div>
 </section>
@@ -826,33 +919,28 @@ function initStars() {
   stars = [];
   const count = Math.floor((innerWidth * innerHeight) / 2200);
   const colors = [
-    [240,238,255], // cool white
-    [255,240,200], // warm gold
-    [210,220,255], // icy blue
-    [255,210,230], // soft rose
+    [240,238,255],
+    [255,240,200],
+    [210,220,255],
+    [255,210,230],
   ];
   for (let i = 0; i < count; i++) {
     const c = colors[Math.floor(Math.random() * colors.length)];
-    // Each star gets 1-3 sine waves combined for organic twinkle
     stars.push({
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
       r: Math.random() * 1.6 + 0.3,
       baseAlpha: Math.random() * 0.5 + 0.4,
       color: c,
-      // primary twinkle
       f1: Math.random() * 0.6 + 0.3,
       p1: Math.random() * Math.PI * 2,
       a1: Math.random() * 0.4 + 0.1,
-      // secondary shimmer (faster, subtler)
       f2: Math.random() * 2 + 1,
       p2: Math.random() * Math.PI * 2,
       a2: Math.random() * 0.15,
-      // size pulse
       rPulse: Math.random() * 0.5,
       rPhase: Math.random() * Math.PI * 2,
       rFreq: Math.random() * 0.4 + 0.1,
-      // glow for bigger stars
       glow: Math.random() > 0.75,
     });
   }
@@ -896,24 +984,24 @@ function shootingStar() {
   setTimeout(() => el.remove(), 1400);
 }
 
-const style = document.createElement('style');
-style.textContent = `
+const shootStyle = document.createElement('style');
+shootStyle.textContent = `
   @keyframes shoot {
     0%  { transform: translate(0,0) rotate(-35deg); opacity: 1; }
     100%{ transform: translate(220px, 120px) rotate(-35deg); opacity: 0; }
   }
 `;
-document.head.appendChild(style);
+document.head.appendChild(shootStyle);
 
 setInterval(() => { if (Math.random() < 0.5) shootingStar(); }, 3500);
 
 let raf;
-function loop(t) {
+function starLoop(t) {
   drawStars(t / 1000);
-  raf = requestAnimationFrame(loop);
+  raf = requestAnimationFrame(starLoop);
 }
 
-resize(); initStars(); requestAnimationFrame(loop);
+resize(); initStars(); requestAnimationFrame(starLoop);
 window.addEventListener('resize', () => { resize(); initStars(); });
 
 
@@ -932,7 +1020,6 @@ function loadPhoto(input) {
   if (!file) return;
   const reader = new FileReader();
   reader.onload = e => {
-    // Remove placeholder, add image
     card.querySelector('.photo-placeholder')?.remove();
     let img = card.querySelector('img');
     if (!img) {
@@ -970,10 +1057,160 @@ function saveLetter() {
   closeLetterModal();
 }
 
-/* Close modal on overlay click */
 document.getElementById('letterModal').addEventListener('click', function(e) {
   if (e.target === this) closeLetterModal();
 });
+
+
+/* ────────── ANNIVERSARY CONFETTI ────────── */
+(function(){
+  const cc = document.getElementById('confetti-canvas');
+  const cx = cc.getContext('2d');
+  cc.width = innerWidth; cc.height = innerHeight;
+  window.addEventListener('resize', () => { cc.width = innerWidth; cc.height = innerHeight; });
+
+  const COLORS = [
+    '#c8a96e','#f0eeff','#d4789a','#6b5b9e',
+    '#e8c99a','#f7d6e6','#a898d8','#ffecd2',
+    '#ffffff','#ffe0b2'
+  ];
+  const SHAPES = ['rect','circle','star','heart','diamond'];
+
+  function rnd(a,b){ return a + Math.random()*(b-a); }
+
+  class Piece {
+    constructor(burst){
+      const bx = burst ? burst.x : rnd(0.1, 0.9) * cc.width;
+      const by = burst ? burst.y : -20;
+      this.x = bx + rnd(-100, 100);
+      this.y = by;
+      this.vx = burst ? rnd(-8, 8) : rnd(-3, 3);
+      this.vy = burst ? rnd(-16, -5) : rnd(1.5, 5);
+      this.gravity = 0.2;
+      this.size = rnd(5, 13);
+      this.color = COLORS[Math.floor(Math.random()*COLORS.length)];
+      this.shape = SHAPES[Math.floor(Math.random()*SHAPES.length)];
+      this.rotation = rnd(0, Math.PI*2);
+      this.spin = rnd(-0.18, 0.18);
+      this.alpha = 1;
+      this.decay = rnd(0.007, 0.013);
+      this.wobble = rnd(0, Math.PI*2);
+      this.wobbleSpeed = rnd(0.04, 0.1);
+      this.scaleX = 1;
+      this.scaleDir = rnd(-0.03, 0.03);
+    }
+    update(){
+      this.wobble += this.wobbleSpeed;
+      this.vx += Math.sin(this.wobble) * 0.08;
+      this.vy += this.gravity;
+      this.x += this.vx; this.y += this.vy;
+      this.rotation += this.spin;
+      this.alpha -= this.decay;
+      this.scaleX += this.scaleDir;
+      if(this.scaleX > 1 || this.scaleX < 0.1) this.scaleDir *= -1;
+    }
+    draw(){
+      cx.save();
+      cx.globalAlpha = Math.max(0, this.alpha);
+      cx.translate(this.x, this.y);
+      cx.rotate(this.rotation);
+      cx.scale(this.scaleX, 1);
+      cx.fillStyle = this.color;
+
+      const s = this.size;
+      if(this.shape === 'rect'){
+        cx.fillRect(-s/2, -s*0.3, s, s*0.6);
+      } else if(this.shape === 'circle'){
+        cx.beginPath(); cx.arc(0,0,s/2,0,Math.PI*2); cx.fill();
+      } else if(this.shape === 'diamond'){
+        cx.beginPath();
+        cx.moveTo(0,-s/2); cx.lineTo(s/2,0);
+        cx.lineTo(0,s/2); cx.lineTo(-s/2,0);
+        cx.closePath(); cx.fill();
+      } else if(this.shape === 'star'){
+        let rot = -Math.PI/2, step = Math.PI/5;
+        cx.beginPath(); cx.moveTo(0,-s/2);
+        for(let i=0;i<5;i++){
+          cx.lineTo(Math.cos(rot)*s/2, Math.sin(rot)*s/2); rot+=step;
+          cx.lineTo(Math.cos(rot)*s/4, Math.sin(rot)*s/4); rot+=step;
+        }
+        cx.closePath(); cx.fill();
+      } else {
+        // heart
+        cx.beginPath();
+        cx.moveTo(0, s*0.25);
+        cx.bezierCurveTo(s*0.25, -s*0.25, s*0.8, s*0.1, 0, s*0.8);
+        cx.bezierCurveTo(-s*0.8, s*0.1, -s*0.25, -s*0.25, 0, s*0.25);
+        cx.closePath(); cx.fill();
+      }
+      cx.restore();
+    }
+    dead(){ return this.alpha <= 0 || this.y > cc.height + 60; }
+  }
+
+  let pieces = [], running = true, startTime = null;
+  const RAIN_DURATION = 5500;
+
+  function burst(x, y, count){
+    for(let i=0;i<count;i++) pieces.push(new Piece({x,y}));
+  }
+
+  function loop(ts){
+    if(!startTime) startTime = ts;
+    const elapsed = ts - startTime;
+
+    if(elapsed < RAIN_DURATION && pieces.length < 260){
+      pieces.push(new Piece(null));
+      if(elapsed < 300) pieces.push(new Piece(null)); // extra density at start
+    }
+
+    cx.clearRect(0, 0, cc.width, cc.height);
+    pieces = pieces.filter(p => !p.dead());
+    pieces.forEach(p => { p.update(); p.draw(); });
+
+    if(running) requestAnimationFrame(loop);
+  }
+
+  const toast = document.getElementById('anni-toast');
+  const overlay = document.getElementById('confetti-overlay');
+
+  // Show toast
+  setTimeout(() => { toast.classList.add('show'); }, 150);
+
+  // Burst explosions
+  setTimeout(() => {
+    burst(cc.width * 0.25, cc.height * 0.45, 70);
+    burst(cc.width * 0.75, cc.height * 0.45, 70);
+    burst(cc.width * 0.5,  cc.height * 0.3,  60);
+  }, 300);
+
+  // Second wave bursts
+  setTimeout(() => {
+    burst(cc.width * 0.15, cc.height * 0.6, 40);
+    burst(cc.width * 0.85, cc.height * 0.6, 40);
+  }, 900);
+
+  // Start rain loop
+  requestAnimationFrame(loop);
+
+  // Fade out toast
+  setTimeout(() => { toast.classList.add('hide'); }, 4000);
+
+  // Fade out overlay + reveal hero text
+  setTimeout(() => {
+    overlay.classList.add('fade-out');
+    document.getElementById('hero').classList.add('revealed');
+  }, 5200);
+
+  // Cleanup everything
+  setTimeout(() => {
+    running = false;
+    cx.clearRect(0, 0, cc.width, cc.height);
+    toast.remove();
+    cc.remove();
+    overlay.remove();
+  }, 7000);
+})();
 </script>
 </body>
 </html>
