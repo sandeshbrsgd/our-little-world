@@ -441,6 +441,7 @@ pwInput.addEventListener('input', ()=>{
   if(pwEntered.length === 8){
     pwLocked = true;
     if(pwEntered === CORRECT_PIN){
+      pwInput.blur();  // ← ADD THIS LINE to dismiss keyboard
       updateDots('success');
       pwLockIcon.textContent = '🔓';
       stopTrainLoop();
