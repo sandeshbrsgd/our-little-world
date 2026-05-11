@@ -8,889 +8,389 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Cinzel:wght@400;600&family=Sacramento&display=swap" rel="stylesheet">
 <style>
   :root {
-    --ink: #0a0a1a;
-    --deep: #06061a;
-    --star-white: #f0eeff;
-    --gold: #c8a96e;
-    --gold-dim: #7a6340;
-    --rose: #d4789a;
-    --violet: #6b5b9e;
-    --mist: rgba(200,169,110,0.08);
-    --glass: rgba(255,255,255,0.04);
+    --ink: #0a0a1a; --deep: #06061a; --star-white: #f0eeff;
+    --gold: #c8a96e; --gold-dim: #7a6340; --rose: #d4789a;
+    --violet: #6b5b9e; --glass: rgba(255,255,255,0.04);
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--deep);color:var(--star-white);font-family:'Cormorant Garamond',serif;font-size:18px;line-height:1.7;overflow-x:hidden;}
+
+  /* ═══ PASSWORD SCREEN ═══ */
+  #password-screen{
+    position:fixed;inset:0;z-index:9999;background:#06061a;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    overflow:hidden;transition:opacity 0.9s ease,transform 0.9s ease;
+  }
+  #password-screen.unlock-out{opacity:0;transform:scale(1.04);pointer-events:none;}
+  #pw-stars{position:absolute;inset:0;pointer-events:none;z-index:0;}
+  #pw-train-canvas{position:absolute;bottom:0;left:0;right:0;height:200px;width:100%;pointer-events:none;z-index:1;}
+  #password-screen::before{
+    content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
+    background:radial-gradient(ellipse 70% 50% at 50% 50%,rgba(107,91,158,0.2) 0%,transparent 70%);
   }
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  html { scroll-behavior: smooth; }
-
-  body {
-    background: var(--deep);
-    color: var(--star-white);
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 18px;
-    line-height: 1.7;
-    overflow-x: hidden;
+  .pw-content{
+    position:relative;z-index:10;text-align:center;
+    padding-bottom:210px;
+    padding-top:clamp(3.5rem,12vh,6rem);
+    display:flex;flex-direction:column;align-items:center;
   }
 
-  /* ── STAR CANVAS ── */
-  #starfield {
-    position: fixed; inset: 0;
-    pointer-events: none;
-    z-index: 0;
+  /* Route heading — Mumbai · Pune · Mumbai */
+  .pw-route{
+    display:flex;align-items:center;justify-content:center;
+    gap:0;margin-bottom:2.2rem;
+    animation:fadeUp 1s 0.2s both;
+    padding:0 1rem;
+  }
+  .pw-city-name{
+    font-family:'Cinzel',serif;
+    font-size:clamp(0.8rem,4vw,1.8rem);
+    font-weight:600;letter-spacing:0.12em;
+    color:var(--star-white);text-transform:uppercase;line-height:1;
+    white-space:nowrap;
+  }
+  .pw-city-sub{
+    display:block;
+    font-family:'Cormorant Garamond',serif;font-style:italic;
+    font-size:clamp(0.5rem,1.2vw,0.68rem);font-weight:400;
+    letter-spacing:0.32em;color:var(--gold);margin-top:0.4rem;
+    text-transform:uppercase;
+  }
+  .pw-connector{
+    display:flex;flex-direction:column;align-items:center;gap:4px;
+    padding:0 clamp(0.4rem,2vw,1.8rem);
+    padding-bottom:2px;
+  }
+  .pw-connector-line{
+    width:clamp(20px,4vw,80px);height:1px;
+    background:linear-gradient(to right,rgba(200,169,110,0.1),rgba(200,169,110,0.65),rgba(200,169,110,0.1));
+  }
+  .pw-connector-gem{
+    width:5px;height:5px;border-radius:50%;
+    background:var(--gold);box-shadow:0 0 8px rgba(200,169,110,0.8);
   }
 
-  /* ── SHOOTING STARS ── */
-  .shooting-star {
-    position: fixed;
-    width: 2px;
-    height: 2px;
-    background: white;
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 1;
-  }
-  .shooting-star::after {
-    content: '';
-    position: absolute;
-    top: 50%; left: 50%;
-    width: 80px; height: 1px;
-    background: linear-gradient(to left, white, transparent);
-    transform: translateY(-50%);
+  /* Lock icon */
+  .pw-lock{
+    font-size:1.3rem;margin-bottom:1.5rem;display:block;
+    opacity:0.55;animation:fadeUp 1s 0.45s both;
   }
 
-  /* ── SECTIONS ── */
-  section { position: relative; z-index: 2; }
-
-  /* ── HERO ── */
-  #hero {
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 2rem;
-    position: relative;
+  /* Hint line */
+  .pw-hint-line{
+    font-family:'Cormorant Garamond',serif;font-style:italic;
+    font-size:clamp(0.75rem,2vw,1rem);
+    color:rgba(240,238,255,0.28);letter-spacing:0.06em;
+    margin-bottom:1.6rem;animation:fadeUp 1s 0.35s both;
+    padding:0 1.5rem;
   }
 
-  #hero::before {
-    content: '';
-    position: absolute; inset: 0;
-    background: radial-gradient(ellipse 80% 60% at 50% 60%, rgba(107,91,158,0.2) 0%, transparent 70%);
+  /* Dots */
+  .pw-dots{display:flex;gap:18px;justify-content:center;margin-bottom:1.2rem;animation:fadeUp 1s 0.6s both;}
+  .pw-dot{
+    width:13px;height:13px;border-radius:50%;
+    border:1.5px solid rgba(200,169,110,0.35);background:transparent;
+    transition:background 0.2s,border-color 0.2s,box-shadow 0.2s;
   }
 
-  .header-title {
-    font-size: 15px;
-    font-weight: 1000;
+  @media(max-width:480px){
+    .pw-content{ padding-bottom:190px; padding-top:clamp(2.5rem,10vh,4rem); }
+    #pw-train-canvas{ height:160px !important; }
+    .pw-hint-line{ margin-bottom:1.2rem; }
+    .pw-lock{ margin-bottom:1.1rem; }
+    .pw-dots{ gap:16px; margin-bottom:1rem; }
+  }
+  .pw-dot.filled{background:var(--gold);border-color:var(--gold);box-shadow:0 0 14px rgba(200,169,110,0.6);}
+  .pw-dot.error{background:var(--rose);border-color:var(--rose);box-shadow:0 0 12px rgba(212,120,154,0.6);animation:dotShake 0.42s ease;}
+  .pw-dot.success{background:#5dcaa5;border-color:#5dcaa5;box-shadow:0 0 14px rgba(93,202,165,0.65);}
+  @keyframes dotShake{0%,100%{transform:translateX(0);}25%{transform:translateX(-7px);}75%{transform:translateX(7px);}}
+
+  #pw-input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none;}
+
+  .pw-tap{
+    font-family:'Cormorant Garamond',serif;font-style:italic;
+    font-size:0.85rem;color:rgba(200,169,110,0.35);
+    letter-spacing:0.07em;cursor:pointer;transition:color 0.25s;
+    animation:fadeUp 1s 0.85s both;
+  }
+  .pw-tap:hover{color:rgba(200,169,110,0.6);}
+
+  .pw-error-msg{
+    font-family:'Cormorant Garamond',serif;font-style:italic;
+    font-size:0.88rem;color:var(--rose);opacity:0;
+    transition:opacity 0.3s;margin-top:0.55rem;min-height:1.3rem;
+  }
+  .pw-error-msg.show{opacity:1;}
+
+  .pw-unlocked{display:none;flex-direction:column;align-items:center;gap:0.3rem;}
+  .pw-unlocked.show{display:flex;}
+  .pw-unlocked-main{font-family:'Sacramento',cursive;font-size:clamp(2.4rem,8vw,4rem);color:var(--star-white);text-shadow:0 0 40px rgba(93,202,165,0.45);}
+  .pw-unlocked-sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1rem;color:rgba(240,238,255,0.42);letter-spacing:0.05em;}
+
+  /* ═══ SITE CONTENT ═══ */
+  #site-content{display:none;}
+  #site-content.revealed{display:block;}
+
+  #starfield{position:fixed;inset:0;pointer-events:none;z-index:0;}
+  section{position:relative;z-index:2;}
+
+  #hero{height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem;position:relative;}
+  #hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 60%,rgba(107,91,158,0.2) 0%,transparent 70%);}
+  .header-title{font-size:15px;font-weight:1000;}
+  @media screen and (max-width:768px){.header-title{font-size:10px;font-weight:800;}.header-div{gap:20px;}}
+  .hero-eyebrow{font-family:'Cinzel',serif;font-size:0.8rem;letter-spacing:0.35em;color:var(--gold);text-transform:uppercase;opacity:0;animation:fadeUp 1.2s 0.4s forwards;margin-bottom:1.5rem;}
+  .hero-title{font-family:'Sacramento',cursive;font-size:clamp(4rem,10vw,7rem);font-weight:500;color:var(--star-white);line-height:1.1;opacity:0;animation:fadeUp 1.2s 0.7s forwards;text-shadow:0 0 60px rgba(200,169,110,0.4),0 0 120px rgba(107,91,158,0.3);}
+  .hero-sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(1.25rem,2.5vw,1.3rem);color:rgba(240,238,255,0.6);margin-top:1.2rem;opacity:0;animation:fadeUp 1.2s 1s forwards;letter-spacing:0.04em;}
+  .hero-date{font-family:'Cinzel',serif;font-size:0.85rem;font-weight:600;letter-spacing:0.3em;color:var(--gold);margin-top:2.5rem;opacity:0;animation:fadeUp 1.2s 1.3s forwards;}
+  .scroll-hint{position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:0.5rem;opacity:0;animation:fadeIn 1s 2s forwards;}
+  .scroll-hint span{font-size:0.6rem;letter-spacing:0.3em;color:rgba(200,169,110,0.5);font-family:'Cinzel',serif;text-transform:uppercase;}
+  .scroll-hint .line{width:1px;height:50px;background:linear-gradient(to bottom,var(--gold),transparent);animation:pulse-line 2s infinite;}
+
+  .divider{display:flex;align-items:center;justify-content:center;gap:1.5rem;padding:3rem 2rem;color:var(--gold-dim);}
+  .divider::before,.divider::after{content:'';flex:1;max-width:200px;height:1px;background:linear-gradient(to right,transparent,var(--gold-dim));}
+  .divider::after{background:linear-gradient(to left,transparent,var(--gold-dim));}
+  .divider-symbol{font-size:1rem;color:var(--gold);}
+
+  .section-header{text-align:center;padding:0 2rem 3rem;}
+  .section-label{font-family:'Cinzel',serif;font-size:0.8rem;letter-spacing:0.4em;color:var(--gold);text-transform:uppercase;display:block;margin-bottom:0.8rem;}
+  .section-title{font-family:'Sacramento',cursive;font-size:clamp(2rem,6vw,4rem);font-weight:400;color:var(--star-white);text-shadow:0 0 40px rgba(200,169,110,0.2);}
+
+  #story{padding:4rem 0 6rem;}
+  .timeline{position:relative;max-width:700px;margin:0 auto;padding:0 2rem;}
+  .timeline::before{content:'';position:absolute;left:50%;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,transparent,var(--gold-dim) 10%,var(--gold-dim) 90%,transparent);transform:translateX(-50%);}
+  .timeline-item{display:grid;grid-template-columns:1fr 40px 1fr;gap:0;margin-bottom:3.5rem;opacity:0;transform:translateY(30px);transition:opacity 0.7s,transform 0.7s;}
+  .timeline-item.visible{opacity:1;transform:translateY(0);}
+  .timeline-item:nth-child(odd) .tl-content{grid-column:1;text-align:right;padding-right:2rem;}
+  .timeline-item:nth-child(odd) .tl-empty{grid-column:3;}
+  .timeline-item:nth-child(even) .tl-content{grid-column:3;text-align:left;padding-left:2rem;}
+  .timeline-item:nth-child(even) .tl-empty{grid-column:1;}
+  .tl-dot{grid-column:2;grid-row:1;display:flex;align-items:flex-start;justify-content:center;padding-top:4px;z-index:2;}
+  .tl-dot-inner{width:12px;height:12px;border-radius:50%;background:var(--gold);box-shadow:0 0 12px rgba(200,169,110,0.6),0 0 30px rgba(200,169,110,0.3);flex-shrink:0;}
+  .tl-date{font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.25em;color:var(--gold);text-transform:uppercase;margin-bottom:0.4rem;}
+  .tl-title{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:600;color:var(--star-white);margin-bottom:0.3rem;}
+  .tl-desc{font-size:1rem;color:rgba(240,238,255,0.55);line-height:1.6;font-style:italic;}
+
+  #gallery{padding:4rem 0 6rem;}
+  .gallery-grid{max-width:960px;margin:0 auto;padding:0 2rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.2rem;}
+  .gallery-card{position:relative;border-radius:4px;overflow:hidden;aspect-ratio:4/5;background:var(--glass);border:1px solid rgba(200,169,110,0.12);cursor:pointer;opacity:0;transform:scale(0.95);transition:opacity 0.6s,transform 0.6s,box-shadow 0.4s;display:flex;align-items:center;text-align:center;justify-content:center;}
+  .gallery-card.visible{opacity:1;transform:scale(1);}
+  .gallery-card:hover{box-shadow:0 0 40px rgba(200,169,110,0.2);}
+  .gallery-card img{width:100%;height:100%;object-fit:cover;transition:transform 0.6s;display:block;}
+  .gallery-card:hover img{transform:scale(1.05);}
+
+  #letters{padding:4rem 0 6rem;}
+  .letters-wrap{max-width:760px;margin:0 auto;padding:0 2rem;display:flex;flex-direction:column;gap:3rem;}
+  .letter-card{background:linear-gradient(135deg,rgba(107,91,158,0.08),rgba(200,169,110,0.05));border:1px solid rgba(200,169,110,0.14);border-radius:2px;padding:2.5rem 2.5rem 2rem;position:relative;opacity:0;transform:translateY(20px);transition:opacity 0.7s,transform 0.7s;}
+  .letter-card.visible{opacity:1;transform:translateY(0);}
+  .letter-card::before{content:'"';position:absolute;top:-0.5rem;left:1.5rem;font-family:'Sacramento',cursive;font-size:5rem;color:var(--gold);opacity:0.2;line-height:1;}
+  .letter-from{font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.3em;color:var(--gold);text-transform:uppercase;margin-bottom:1rem;}
+  .letter-body{font-style:italic;font-size:1.05rem;color:rgba(240,238,255,0.8);line-height:1.9;position:relative;z-index:1;}
+  .letter-sign{font-family:'Sacramento',cursive;font-size:1.6rem;color:var(--rose);margin-top:1.2rem;display:block;opacity:0.85;}
+
+  .modal-overlay{position:fixed;inset:0;background:rgba(6,6,26,0.92);backdrop-filter:blur(10px);z-index:100;display:flex;align-items:center;justify-content:center;padding:2rem;opacity:0;pointer-events:none;transition:opacity 0.3s;}
+  .modal-overlay.open{opacity:1;pointer-events:all;}
+  .modal{background:linear-gradient(135deg,#0e0d25,#120f2a);border:1px solid rgba(200,169,110,0.2);border-radius:4px;padding:2.5rem;width:100%;max-width:540px;position:relative;transform:translateY(20px);transition:transform 0.3s;}
+  .modal-overlay.open .modal{transform:translateY(0);}
+  .modal h3{font-family:'Sacramento',cursive;font-size:2.2rem;color:var(--star-white);margin-bottom:1.5rem;font-weight:400;}
+  .modal input,.modal textarea{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(200,169,110,0.2);border-radius:2px;padding:0.8rem 1rem;color:var(--star-white);font-family:'Cormorant Garamond',serif;font-size:1rem;margin-bottom:1rem;outline:none;transition:border-color 0.3s;}
+  .modal input:focus,.modal textarea:focus{border-color:rgba(200,169,110,0.5);}
+  .modal textarea{min-height:120px;resize:vertical;}
+  .modal input::placeholder,.modal textarea::placeholder{color:rgba(240,238,255,0.3);font-style:italic;}
+  .modal-btns{display:flex;gap:0.8rem;justify-content:flex-end;margin-top:0.5rem;}
+  .btn{font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;padding:0.7rem 1.4rem;border-radius:2px;cursor:pointer;transition:all 0.3s;border:1px solid;}
+  .btn-ghost{background:none;border-color:rgba(200,169,110,0.25);color:rgba(240,238,255,0.4);}
+  .btn-ghost:hover{border-color:rgba(200,169,110,0.5);color:var(--gold);}
+  .btn-primary{background:rgba(200,169,110,0.12);border-color:var(--gold);color:var(--gold);}
+  .btn-primary:hover{background:rgba(200,169,110,0.2);}
+  .close-modal{position:absolute;top:1rem;right:1rem;background:none;border:none;color:rgba(240,238,255,0.3);font-size:1.2rem;cursor:pointer;line-height:1;transition:color 0.2s;}
+  .close-modal:hover{color:var(--gold);}
+
+  footer{position:relative;z-index:2;text-align:center;padding:5rem 2rem 4rem;border-top:1px solid rgba(200,169,110,0.08);}
+  footer .big-msg{font-family:'Lucida Handwriting',cursive;font-size:clamp(2rem,5vw,3.5rem);color:var(--star-white);opacity:0.9;text-shadow:0 0 40px rgba(200,169,110,0.3);line-height:1.3;}
+  footer .hearts{font-size:1.3rem;margin:1.5rem 0;letter-spacing:0.5rem;animation:pulse-hearts 2s infinite;color:#d4789a;}
+  footer small{display:block;font-family:'Cinzel',serif;font-size:0.58rem;letter-spacing:0.3em;color:rgba(200,169,110,0.3);margin-top:2rem;text-transform:uppercase;}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(25px);}to{opacity:1;transform:translateY(0);}}
+  @keyframes fadeIn{to{opacity:1;}}
+  @keyframes pulse-line{0%,100%{opacity:0.3;transform:scaleY(1);}50%{opacity:0.8;transform:scaleY(1.1);}}
+  @keyframes pulse-hearts{0%,100%{opacity:0.6;transform:scale(1);}50%{opacity:1;transform:scale(1.05);}}
+
+  nav{position:fixed;top:0;left:0;right:0;z-index:50;padding:1.2rem 2rem;display:flex;justify-content:center;gap:2.5rem;background:linear-gradient(to bottom,rgba(6,6,26,0.7),transparent);backdrop-filter:blur(4px);}
+  nav a{font-family:'Cinzel',serif;font-size:0.58rem;letter-spacing:0.3em;text-transform:uppercase;color:rgba(200,169,110,0.55);text-decoration:none;transition:color 0.3s;}
+  nav a:hover{color:var(--gold);}
+
+  @media(max-width:600px){
+    .timeline::before{left:20px;}
+    .timeline-item{grid-template-columns:40px 1fr;}
+    .timeline-item:nth-child(odd) .tl-content,.timeline-item:nth-child(even) .tl-content{grid-column:2;text-align:left;padding-left:1.5rem;padding-right:0;}
+    .timeline-item:nth-child(odd) .tl-empty,.timeline-item:nth-child(even) .tl-empty{display:none;}
+    .tl-dot{grid-column:1;}
   }
 
-  @media screen and (max-width: 768px) {
-    .header-title {
-      font-size: 10px;
-      font-weight: 800;
-    }
-    .header-div {
-      gap: 20px;
-    }
-  }
+  #confetti-overlay{position:fixed;inset:0;background:var(--deep);z-index:990;opacity:1;transition:opacity 0.8s ease;pointer-events:none;}
+  #confetti-overlay.fade-out{opacity:0;}
+  #confetti-canvas{position:fixed;inset:0;pointer-events:none;z-index:999;}
 
-  .hero-eyebrow {
-    font-family: 'Cinzel', serif;
-    font-size: 0.8rem;
-    letter-spacing: 0.35em;
-    color: var(--gold);
-    text-transform: uppercase;
-    opacity: 0;
-    animation: fadeUp 1.2s 0.4s forwards;
-    margin-bottom: 1.5rem;
-  }
+  #anni-toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);text-align:center;z-index:1000;pointer-events:none;transition:transform 0.55s cubic-bezier(0.34,1.56,0.64,1),opacity 0.6s;}
+  #anni-toast.show{transform:translate(-50%,-50%) scale(1);}
+  #anni-toast.hide{opacity:0;transform:translate(-50%,-55%) scale(0.9);}
+  #anni-toast .toast-small{font-family:'Cinzel',serif;font-size:clamp(0.45rem,2.5vw,0.75rem);letter-spacing:clamp(0.15em,1vw,0.45em);color:var(--gold);text-transform:uppercase;margin-bottom:clamp(0.4rem,1.5vw,0.8rem);opacity:0.85;white-space:nowrap;}
+  #anni-toast .toast-line1{font-family:'Sacramento',cursive;font-size:clamp(2.8rem,16vw,7rem);color:var(--star-white);line-height:0.95;text-shadow:0 0 60px rgba(200,169,110,0.5),0 0 120px rgba(107,91,158,0.3);display:block;}
+  #anni-toast .toast-line2{font-family:'Cinzel',serif;font-size:clamp(0.85rem,5vw,2rem);font-weight:600;letter-spacing:clamp(0.1em,1vw,0.25em);color:var(--gold);text-transform:uppercase;display:block;margin-top:0.2rem;text-shadow:0 0 30px rgba(200,169,110,0.4);}
+  #anni-toast .toast-line3{font-family:'Sacramento',cursive;font-size:clamp(1.8rem,10vw,3.5rem);color:var(--star-white);display:block;margin-top:0.1rem;line-height:1.1;text-shadow:0 0 40px rgba(200,169,110,0.4);}
+  #anni-toast .toast-hearts{font-size:clamp(0.9rem,3vw,1.2rem);margin-top:clamp(0.5rem,2vw,1rem);letter-spacing:clamp(0.3rem,2vw,0.6rem);color:#d4789a;display:block;animation:pulse-hearts 1.5s infinite;}
 
-  .hero-title {
-    font-family: 'Sacramento', cursive;
-    font-size: clamp(4rem, 10vw, 7rem);
-    font-weight: 500;
-    color: var(--star-white);
-    line-height: 1.1;
-    opacity: 0;
-    animation: fadeUp 1.2s 0.7s forwards;
-    text-shadow: 0 0 60px rgba(200,169,110,0.4), 0 0 120px rgba(107,91,158,0.3);
-  }
-
-  .hero-sub {
-    font-family: 'Cormorant Garamond', serif;
-    font-style: italic;
-    font-size: clamp(1.25rem, 2.5vw, 1.3rem);
-    color: rgba(240,238,255,0.6);
-    margin-top: 1.2rem;
-    opacity: 0;
-    animation: fadeUp 1.2s 1s forwards;
-    letter-spacing: 0.04em;
-  }
-
-  .hero-date {
-    font-family: 'Cinzel', serif;
-    font-size: 0.85rem;
-    font-weight: 600;
-    letter-spacing: 0.3em;
-    color: var(--gold);
-    margin-top: 2.5rem;
-    opacity: 0;
-    animation: fadeUp 1.2s 1.3s forwards;
-  }
-
-  .scroll-hint {
-    position: absolute;
-    bottom: 2.5rem;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    opacity: 0;
-    animation: fadeIn 1s 2s forwards;
-  }
-  .scroll-hint span {
-    font-size: 0.6rem;
-    letter-spacing: 0.3em;
-    color: rgba(200,169,110,0.5);
-    font-family: 'Cinzel', serif;
-    text-transform: uppercase;
-  }
-  .scroll-hint .line {
-    width: 1px;
-    height: 50px;
-    background: linear-gradient(to bottom, var(--gold), transparent);
-    animation: pulse-line 2s infinite;
-  }
-
-  /* ── DIVIDER ── */
-  .divider {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 1.5rem;
-    padding: 3rem 2rem;
-    color: var(--gold-dim);
-  }
-  .divider::before, .divider::after {
-    content: '';
-    flex: 1;
-    max-width: 200px;
-    height: 1px;
-    background: linear-gradient(to right, transparent, var(--gold-dim));
-  }
-  .divider::after { background: linear-gradient(to left, transparent, var(--gold-dim)); }
-  .divider-symbol { font-size: 1rem; color: var(--gold); }
-
-  /* ── SECTION TITLES ── */
-  .section-header {
-    text-align: center;
-    padding: 0 2rem 3rem;
-  }
-  .section-label {
-    font-family: 'Cinzel', serif;
-    font-size: 0.8rem;
-    letter-spacing: 0.4em;
-    color: var(--gold);
-    text-transform: uppercase;
-    display: block;
-    margin-bottom: 0.8rem;
-  }
-  .section-title {
-    font-family: 'Sacramento', cursive;
-    font-size: clamp(2.0rem, 6vw, 4rem);
-    font-weight: 400;
-    color: var(--star-white);
-    text-shadow: 0 0 40px rgba(200,169,110,0.2);
-  }
-
-  /* ── TIMELINE ── */
-  #story { padding: 4rem 0 6rem; }
-
-  .timeline {
-    position: relative;
-    max-width: 700px;
-    margin: 0 auto;
-    padding: 0 2rem;
-  }
-  .timeline::before {
-    content: '';
-    position: absolute;
-    left: 50%;
-    top: 0; bottom: 0;
-    width: 1px;
-    background: linear-gradient(to bottom, transparent, var(--gold-dim) 10%, var(--gold-dim) 90%, transparent);
-    transform: translateX(-50%);
-  }
-
-  .timeline-item {
-    display: grid;
-    grid-template-columns: 1fr 40px 1fr;
-    gap: 0;
-    margin-bottom: 3.5rem;
-    opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.7s, transform 0.7s;
-  }
-  .timeline-item.visible { opacity: 1; transform: translateY(0); }
-
-  .timeline-item:nth-child(odd) .tl-content { grid-column: 1; text-align: right; padding-right: 2rem; }
-  .timeline-item:nth-child(odd) .tl-empty  { grid-column: 3; }
-  .timeline-item:nth-child(even) .tl-content { grid-column: 3; text-align: left; padding-left: 2rem; }
-  .timeline-item:nth-child(even) .tl-empty  { grid-column: 1; }
-
-  .tl-dot {
-    grid-column: 2;
-    grid-row: 1;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    padding-top: 4px;
-    z-index: 2;
-  }
-  .tl-dot-inner {
-    width: 12px; height: 12px;
-    border-radius: 50%;
-    background: var(--gold);
-    box-shadow: 0 0 12px rgba(200,169,110,0.6), 0 0 30px rgba(200,169,110,0.3);
-    flex-shrink: 0;
-  }
-
-  .tl-date {
-    font-family: 'Cinzel', serif;
-    font-size: 0.6rem;
-    letter-spacing: 0.25em;
-    color: var(--gold);
-    text-transform: uppercase;
-    margin-bottom: 0.4rem;
-  }
-  .tl-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.15rem;
-    font-weight: 600;
-    color: var(--star-white);
-    margin-bottom: 0.3rem;
-  }
-  .tl-desc {
-    font-size: 1.00rem;
-    color: rgba(240,238,255,0.55);
-    line-height: 1.6;
-    font-style: italic;
-  }
-
-  /* ── GALLERY ── */
-  #gallery { padding: 4rem 0 6rem; }
-
-  .gallery-grid {
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 0 2rem;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 1.2rem;
-  }
-
-  .gallery-card {
-    position: relative;
-    border-radius: 4px;
-    overflow: hidden;
-    aspect-ratio: 4/5;
-    background: var(--glass);
-    border: 1px solid rgba(200,169,110,0.12);
-    cursor: pointer;
-    opacity: 0;
-    transform: scale(0.95);
-    transition: opacity 0.6s, transform 0.6s, box-shadow 0.4s;
-    display: flex;
-    align-items: center;
-    text-align: center;
-    justify-content: center;
-  }
-  .gallery-card.visible { opacity: 1; transform: scale(1); }
-  .gallery-card:hover { box-shadow: 0 0 40px rgba(200,169,110,0.2); }
-
-  .gallery-card img {
-    width: 100%; height: 100%;
-    object-fit: cover;
-    transition: transform 0.6s;
-    display: block;
-  }
-  .gallery-card:hover img { transform: scale(1.05); }
-
-  .gallery-card .photo-placeholder {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.8rem;
-    color: rgba(200,169,110,0.35);
-    font-family: 'Cinzel', serif;
-    font-size: 0.65rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    padding: 1.5rem;
-    text-align: center;
-  }
-  .gallery-card .photo-placeholder .icon {
-    font-size: 2rem;
-    opacity: 0.5;
-  }
-
-  /* ── LETTERS ── */
-  #letters { padding: 4rem 0 6rem; }
-
-  .letters-wrap {
-    max-width: 760px;
-    margin: 0 auto;
-    padding: 0 2rem;
-    display: flex;
-    flex-direction: column;
-    gap: 3rem;
-  }
-
-  .letter-card {
-    background: linear-gradient(135deg, rgba(107,91,158,0.08), rgba(200,169,110,0.05));
-    border: 1px solid rgba(200,169,110,0.14);
-    border-radius: 2px;
-    padding: 2.5rem 2.5rem 2rem;
-    position: relative;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.7s, transform 0.7s;
-  }
-  .letter-card.visible { opacity: 1; transform: translateY(0); }
-
-  .letter-card::before {
-    content: '"';
-    position: absolute;
-    top: -0.5rem; left: 1.5rem;
-    font-family: 'Sacramento', cursive;
-    font-size: 5rem;
-    color: var(--gold);
-    opacity: 0.2;
-    line-height: 1;
-  }
-
-  .letter-from {
-    font-family: 'Cinzel', serif;
-    font-size: 0.6rem;
-    letter-spacing: 0.3em;
-    color: var(--gold);
-    text-transform: uppercase;
-    margin-bottom: 1rem;
-  }
-  .letter-body {
-    font-style: italic;
-    font-size: 1.05rem;
-    color: rgba(240,238,255,0.8);
-    line-height: 1.9;
-    position: relative;
-    z-index: 1;
-  }
-  .letter-sign {
-    font-family: 'Sacramento', cursive;
-    font-size: 1.6rem;
-    color: var(--rose);
-    margin-top: 1.2rem;
-    display: block;
-    opacity: 0.85;
-  }
-
-  .add-letter-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.6rem;
-    background: none;
-    border: 1px dashed rgba(200,169,110,0.3);
-    color: rgba(200,169,110,0.5);
-    font-family: 'Cinzel', serif;
-    font-size: 0.65rem;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    padding: 1.2rem;
-    border-radius: 2px;
-    cursor: pointer;
-    transition: all 0.3s;
-    width: 100%;
-  }
-  .add-letter-btn:hover {
-    border-color: rgba(200,169,110,0.6);
-    color: var(--gold);
-    background: rgba(200,169,110,0.04);
-  }
-
-  /* Modal */
-  .modal-overlay {
-    position: fixed; inset: 0;
-    background: rgba(6,6,26,0.92);
-    backdrop-filter: blur(10px);
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s;
-  }
-  .modal-overlay.open { opacity: 1; pointer-events: all; }
-
-  .modal {
-    background: linear-gradient(135deg, #0e0d25, #120f2a);
-    border: 1px solid rgba(200,169,110,0.2);
-    border-radius: 4px;
-    padding: 2.5rem;
-    width: 100%;
-    max-width: 540px;
-    position: relative;
-    transform: translateY(20px);
-    transition: transform 0.3s;
-  }
-  .modal-overlay.open .modal { transform: translateY(0); }
-
-  .modal h3 {
-    font-family: 'Sacramento', cursive;
-    font-size: 2.2rem;
-    color: var(--star-white);
-    margin-bottom: 1.5rem;
-    font-weight: 400;
-  }
-  .modal input, .modal textarea, .modal select {
-    width: 100%;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(200,169,110,0.2);
-    border-radius: 2px;
-    padding: 0.8rem 1rem;
-    color: var(--star-white);
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1rem;
-    margin-bottom: 1rem;
-    outline: none;
-    transition: border-color 0.3s;
-  }
-  .modal input:focus, .modal textarea:focus {
-    border-color: rgba(200,169,110,0.5);
-  }
-  .modal textarea { min-height: 120px; resize: vertical; }
-  .modal input::placeholder, .modal textarea::placeholder {
-    color: rgba(240,238,255,0.3);
-    font-style: italic;
-  }
-
-  .modal-btns { display: flex; gap: 0.8rem; justify-content: flex-end; margin-top: 0.5rem; }
-
-  .btn {
-    font-family: 'Cinzel', serif;
-    font-size: 0.65rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    padding: 0.7rem 1.4rem;
-    border-radius: 2px;
-    cursor: pointer;
-    transition: all 0.3s;
-    border: 1px solid;
-  }
-  .btn-ghost {
-    background: none;
-    border-color: rgba(200,169,110,0.25);
-    color: rgba(240,238,255,0.4);
-  }
-  .btn-ghost:hover { border-color: rgba(200,169,110,0.5); color: var(--gold); }
-  .btn-primary {
-    background: rgba(200,169,110,0.12);
-    border-color: var(--gold);
-    color: var(--gold);
-  }
-  .btn-primary:hover { background: rgba(200,169,110,0.2); }
-
-  .close-modal {
-    position: absolute; top: 1rem; right: 1rem;
-    background: none; border: none;
-    color: rgba(240,238,255,0.3);
-    font-size: 1.2rem;
-    cursor: pointer;
-    line-height: 1;
-    transition: color 0.2s;
-  }
-  .close-modal:hover { color: var(--gold); }
-
-  /* ── FOOTER ── */
-  footer {
-    position: relative; z-index: 2;
-    text-align: center;
-    padding: 5rem 2rem 4rem;
-    border-top: 1px solid rgba(200,169,110,0.08);
-  }
-  footer .big-msg {
-    font-family: 'Lucida Handwriting', cursive;
-    font-size: clamp(2rem, 5vw, 3.5rem);
-    color: var(--star-white);
-    opacity: 0.9;
-    text-shadow: 0 0 40px rgba(200,169,110,0.3);
-    line-height: 1.3;
-  }
-  footer .hearts {
-    font-size: 1.3rem;
-    margin: 1.5rem 0;
-    letter-spacing: 0.5rem;
-    animation: pulse-hearts 2s infinite;
-  }
-  footer small {
-    display: block;
-    font-family: 'Cinzel', serif;
-    font-size: 0.58rem;
-    letter-spacing: 0.3em;
-    color: rgba(200,169,110,0.3);
-    margin-top: 2rem;
-    text-transform: uppercase;
-  }
-
-  /* ── ANIMATIONS ── */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(25px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes fadeIn {
-    to { opacity: 1; }
-  }
-  @keyframes pulse-line {
-    0%, 100% { opacity: 0.3; transform: scaleY(1); }
-    50% { opacity: 0.8; transform: scaleY(1.1); }
-  }
-  @keyframes pulse-hearts {
-    0%, 100% { opacity: 0.6; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.05); }
-  }
-  @keyframes twinkle {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-  }
-
-  /* ── NAV ── */
-  nav {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 50;
-    padding: 1.2rem 2rem;
-    display: flex;
-    justify-content: center;
-    gap: 2.5rem;
-    background: linear-gradient(to bottom, rgba(6,6,26,0.7), transparent);
-    backdrop-filter: blur(4px);
-  }
-  nav a {
-    font-family: 'Cinzel', serif;
-    font-size: 0.58rem;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: rgba(200,169,110,0.55);
-    text-decoration: none;
-    transition: color 0.3s;
-  }
-  nav a:hover { color: var(--gold); }
-
-  /* ── RESPONSIVE ── */
-  @media (max-width: 600px) {
-    .timeline::before { left: 20px; }
-    .timeline-item { grid-template-columns: 40px 1fr; }
-    .timeline-item:nth-child(odd) .tl-content,
-    .timeline-item:nth-child(even) .tl-content {
-      grid-column: 2; text-align: left; padding-left: 1.5rem; padding-right: 0;
-    }
-    .timeline-item:nth-child(odd) .tl-empty,
-    .timeline-item:nth-child(even) .tl-empty { display: none; }
-    .tl-dot { grid-column: 1; }
-  }
-
-  /* ── CONFETTI OVERLAY (blocks all page content) ── */
-  #confetti-overlay {
-    position: fixed; inset: 0;
-    background: var(--deep);
-    z-index: 990;
-    opacity: 1;
-    transition: opacity 0.8s ease;
-    pointer-events: none;
-  }
-  #confetti-overlay.fade-out {
-    opacity: 0;
-  }
-
-  /* ── CONFETTI CANVAS ── */
-  #confetti-canvas {
-    position: fixed; inset: 0;
-    pointer-events: none;
-    z-index: 999;
-  }
-
-  /* ── ANNIVERSARY TOAST ── */
-  #anni-toast {
-    position: fixed;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%) scale(0);
-    background: rgba(6,6,26,0.0);
-    text-align: center;
-    z-index: 1000;
-    pointer-events: none;
-    transition: transform 0.55s cubic-bezier(0.34,1.56,0.64,1), opacity 0.6s;
-  }
-  #anni-toast.show { transform: translate(-50%, -50%) scale(1); }
-  #anni-toast.hide { opacity: 0; transform: translate(-50%, -55%) scale(0.9); }
-
-  #anni-toast .toast-small {
-    font-family: 'Cinzel', serif;
-    font-size: clamp(0.45rem, 2.5vw, 0.75rem);
-    letter-spacing: clamp(0.15em, 1vw, 0.45em);
-    color: var(--gold);
-    text-transform: uppercase;
-    margin-bottom: clamp(0.4rem, 1.5vw, 0.8rem);
-    opacity: 0.85;
-    white-space: nowrap;
-  }
-  #anni-toast .toast-line1 {
-    font-family: 'Sacramento', cursive;
-    font-size: clamp(2.8rem, 16vw, 7rem);
-    color: var(--star-white);
-    line-height: 0.95;
-    text-shadow: 0 0 60px rgba(200,169,110,0.5), 0 0 120px rgba(107,91,158,0.3);
-    display: block;
-  }
-  #anni-toast .toast-line2 {
-    font-family: 'Cinzel', serif;
-    font-size: clamp(0.85rem, 5vw, 2rem);
-    font-weight: 600;
-    letter-spacing: clamp(0.1em, 1vw, 0.25em);
-    color: var(--gold);
-    text-transform: uppercase;
-    display: block;
-    margin-top: 0.2rem;
-    text-shadow: 0 0 30px rgba(200,169,110,0.4);
-  }
-  #anni-toast .toast-line3 {
-    font-family: 'Sacramento', cursive;
-    font-size: clamp(1.8rem, 10vw, 3.5rem);
-    color: var(--star-white);
-    display: block;
-    margin-top: 0.1rem;
-    line-height: 1.1;
-    text-shadow: 0 0 40px rgba(200,169,110,0.4);
-  }
-  #anni-toast .toast-hearts {
-    font-size: clamp(0.9rem, 3vw, 1.2rem);
-    margin-top: clamp(0.5rem, 2vw, 1rem);
-    letter-spacing: clamp(0.3rem, 2vw, 0.6rem);
-    color: var(--rose);
-    display: block;
-    animation: pulse-hearts 1.5s infinite;
-  }
-
-  @media (max-width: 480px) {
-    #anni-toast {
-      width: 90vw;
-      padding: 0 1rem;
-    }
-    #anni-toast .toast-small {
-      font-size: 0.82rem;
-      margin-bottom: 80px;
-      letter-spacing: 0.12em;
-      white-space: normal;
-      line-height: 1.6;
-    }
-
-    #anni-toast .toast-line1 {
-      margin-top: 10px;
-    }
-
-    #anni-toast .toast-line2 {
-      margin-top: 20px;
-    }
-  }
-
-  /* Hero content hidden initially, revealed after confetti */
-  #hero .hero-eyebrow,
-  #hero .hero-title,
-  #hero .hero-sub,
-  #hero .hero-date,
-  #hero .scroll-hint {
-    animation: none !important;
-    opacity: 0;
-  }
-  #hero.revealed .hero-eyebrow {
-    animation: fadeUp 1s 0.1s forwards !important;
-  }
-  #hero.revealed .hero-title {
-    animation: fadeUp 1s 0.35s forwards !important;
-  }
-  #hero.revealed .hero-sub {
-    animation: fadeUp 1s 0.6s forwards !important;
-  }
-  #hero.revealed .hero-date {
-    animation: fadeUp 1s 0.85s forwards !important;
-  }
-  #hero.revealed .scroll-hint {
-    animation: fadeIn 1s 1.3s forwards !important;
-  }
+  #hero .hero-eyebrow,#hero .hero-title,#hero .hero-sub,#hero .hero-date,#hero .scroll-hint{animation:none!important;opacity:0;}
+  #hero.revealed .hero-eyebrow{animation:fadeUp 1s 0.1s forwards!important;}
+  #hero.revealed .hero-title{animation:fadeUp 1s 0.35s forwards!important;}
+  #hero.revealed .hero-sub{animation:fadeUp 1s 0.6s forwards!important;}
+  #hero.revealed .hero-date{animation:fadeUp 1s 0.85s forwards!important;}
+  #hero.revealed .scroll-hint{animation:fadeIn 1s 1.3s forwards!important;}
 </style>
 </head>
 <body>
 
-<!-- ── STAR CANVAS ── -->
-<canvas id="starfield"></canvas>
+<!-- PASSWORD SCREEN -->
+<div id="password-screen">
+  <canvas id="pw-stars"></canvas>
+  <canvas id="pw-train-canvas"></canvas>
 
-<!-- ── CONFETTI OVERLAY (hides all page content) ── -->
-<div id="confetti-overlay"></div>
+  <div class="pw-content">
 
-<!-- ── CONFETTI CANVAS ── -->
-<canvas id="confetti-canvas"></canvas>
+    <!-- Mumbai · Pune · Mumbai -->
+    <div class="pw-route">
+      <div class="pw-city-name">Mumbai</div>
+      <div class="pw-connector">
+        <div class="pw-connector-line"></div>
+        <div class="pw-connector-gem"></div>
+        <div class="pw-connector-line"></div>
+      </div>
+      <div class="pw-city-name">Pune</div>
+      <div class="pw-connector">
+        <div class="pw-connector-line"></div>
+        <div class="pw-connector-gem"></div>
+        <div class="pw-connector-line"></div>
+      </div>
+      <div class="pw-city-name">Mumbai</div>
+    </div>
 
-<!-- ── ANNIVERSARY TOAST ── -->
-<div id="anni-toast">
-  <span class="toast-small">✦ &nbsp; A Whole Year Together &nbsp; ✦</span>
-  <span class="toast-line1">Happy</span>
-  <span class="toast-line2">1 Year</span>
-  <span class="toast-line3">Anniversary</span>
-  <span class="toast-hearts">♡ &nbsp; ♡ &nbsp; ♡</span>
+    <p class="pw-hint-line">the journey of a lifetime, locked in eight digits</p>
+
+    <span class="pw-lock" id="pw-lock-icon">🔒</span>
+
+    <div class="pw-dots" id="pw-dots">
+      <div class="pw-dot" id="pwd0"></div>
+      <div class="pw-dot" id="pwd1"></div>
+      <div class="pw-dot" id="pwd2"></div>
+      <div class="pw-dot" id="pwd3"></div>
+      <div class="pw-dot" id="pwd4"></div>
+      <div class="pw-dot" id="pwd5"></div>
+      <div class="pw-dot" id="pwd6"></div>
+      <div class="pw-dot" id="pwd7"></div>
+    </div>
+
+    <input id="pw-input" type="tel" maxlength="8" inputmode="numeric" autocomplete="off" autofocus>
+
+    <p class="pw-tap" id="pw-tap" onclick="focusPwInput()">tap here &amp; type your 4-digit secret</p>
+    <p class="pw-error-msg" id="pw-error">not quite, love…</p>
+
+    <div class="pw-unlocked" id="pw-unlocked">
+      <p class="pw-unlocked-main">You're in <span style="color:#d4789a;">❤</span></p>
+      <p class="pw-unlocked-sub">Welcome home, my golu molu</p>
+    </div>
+
+  </div>
 </div>
 
-<!-- ── NAV ── -->
-<nav class="header-div">
-  <a class="header-title" href="#hero">Home</a>
-  <a class="header-title" href="#story">Our Story</a>
-  <a class="header-title" href="#gallery">Gallery</a>
-  <a class="header-title" href="#letters">Letter</a>
-</nav>
-
-<!-- ── HERO ── -->
-<section id="hero">
-  <p class="hero-eyebrow">One Year Around the Sun Together</p>
-  <h1 class="hero-title">Written in the Stars</h1>
-  <p class="hero-sub">From two hearts, across the miles always.</p>
-  <p class="hero-date" id="anniversary-date">— April 2025 → April 2026 —</p>
-  <div class="scroll-hint">
-    <span>Scroll</span>
-    <div class="line"></div>
+<!-- MAIN SITE -->
+<div id="site-content">
+  <canvas id="starfield"></canvas>
+  <div id="confetti-overlay"></div>
+  <canvas id="confetti-canvas"></canvas>
+  <div id="anni-toast">
+    <span class="toast-small">✦ &nbsp; A Whole Year Together &nbsp; ✦</span>
+    <span class="toast-line1">Happy</span>
+    <span class="toast-line2">1 Year</span>
+    <span class="toast-line3">Anniversary</span>
+    <span class="toast-hearts">❤ &nbsp; ❤ &nbsp; ❤</span>
   </div>
-</section>
-
-<!-- ── OUR STORY ── -->
-<div class="divider"><span class="divider-symbol">✦</span></div>
-<section id="story">
-  <div class="section-header">
-    <span class="section-label">Chapter by Chapter</span>
-    <h2 class="section-title">Our Story</h2>
-  </div>
-  <div class="timeline" id="timeline-container">
-
-    <div class="timeline-item">
-      <div class="tl-content">
-        <p class="tl-date">The Beginning</p>
-        <h3 class="tl-title">The Day We Met</h3>
-        <p class="tl-desc">It still amazes me the way we met, two strangers on an app, unaware that one simple conversation would turn into something so deep and meaningful. Those first few months weren't just about knowing you, they were about feeling something I didn't even realize I was missing. Every message from you became the best part of my day, and I found myself waiting for you without even noticing it. Our late night conversations became my comfort, and somehow, despite the distance, you felt closer than anyone around me. What made it even more special was how you were there through every part of your day, talking to me while you were on your way to work, in between your busy office hours, and again when you were heading back home. And even after all those conversations, it still felt like I could never have enough of you, like no matter how much we talked, my heart always wanted more..</p>
+  <nav class="header-div">
+    <a class="header-title" href="#hero">Home</a>
+    <a class="header-title" href="#story">Our Story</a>
+    <a class="header-title" href="#gallery">Gallery</a>
+    <a class="header-title" href="#letters">Letter</a>
+  </nav>
+  <section id="hero">
+    <p class="hero-eyebrow">One Year Around the Sun Together</p>
+    <h1 class="hero-title">Written in the Stars</h1>
+    <p class="hero-sub">From two hearts, across the miles always.</p>
+    <p class="hero-date">— April 2025 → April 2026 —</p>
+    <div class="scroll-hint"><span>Scroll</span><div class="line"></div></div>
+  </section>
+  <div class="divider"><span class="divider-symbol">✦</span></div>
+  <section id="story">
+    <div class="section-header">
+      <span class="section-label">Chapter by Chapter</span>
+      <h2 class="section-title">Our Story</h2>
+    </div>
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="tl-content"><p class="tl-date">The Beginning</p><h3 class="tl-title">The Day We Met</h3><p class="tl-desc">It still amazes me the way we met, two strangers on an app, unaware that one simple conversation would turn into something so deep and meaningful. Those first few months weren't just about knowing you, they were about feeling something I didn't even realize I was missing. Every message from you became the best part of my day, and I found myself waiting for you without even noticing it. Our late night conversations became my comfort, and somehow, despite the distance, you felt closer than anyone around me.</p></div>
+        <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+        <div class="tl-empty"></div>
       </div>
-      <div class="tl-dot"><div class="tl-dot-inner"></div></div>
-      <div class="tl-empty"></div>
-    </div>
-
-    <div class="timeline-item">
-      <div class="tl-empty"></div>
-      <div class="tl-dot"><div class="tl-dot-inner"></div></div>
-      <div class="tl-content">
-        <p class="tl-date">The Transitional Phase</p>
-        <h3 class="tl-title">First "I Miss You"</h3>
-        <p class="tl-desc">Somewhere between the fourth and eighth month, everything began to feel more real like what we had was no longer just new and exciting, but something deeper, something steady and meaningful. You slowly became a part of my everyday life in the most natural way, like my days felt incomplete without you in them. We shared everything random conversations, deep talks, small arguments, even comfortable silences and through it all, I could feel us growing closer. I started understanding you in ways I never thought I would, noticing the smallest things about you your moods, your thoughts, the way you care. It wasn't just about missing you anymore, it was about needing you, your presence, your voice, your energy. There were a few weeks that weren't easy, when we tried to stay away from each other, and it hurt more than I can explain but even in that distance, we didn't fall apart, we grew stronger. And that's what makes this even more real that despite everything, we found our way back to each other, and here we are today.</p>
+      <div class="timeline-item">
+        <div class="tl-empty"></div>
+        <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+        <div class="tl-content"><p class="tl-date">The Transitional Phase</p><h3 class="tl-title">First "I Miss You"</h3><p class="tl-desc">Somewhere between the fourth and eighth month, everything began to feel more real — like what we had was no longer just new and exciting, but something deeper, something steady and meaningful. You slowly became a part of my everyday life in the most natural way, like my days felt incomplete without you in them. We shared everything — random conversations, deep talks, small arguments, even comfortable silences — and through it all, I could feel us growing closer.</p></div>
+      </div>
+      <div class="timeline-item">
+        <div class="tl-content"><p class="tl-date">The Anniversary Phase</p><h3 class="tl-title">Next Few Months</h3><p class="tl-desc">And then came the last few months — the ones that tested us in ways we never expected. We fought, we misunderstood each other, we tried to stay away, thinking maybe distance would make things easier — but it never did. Instead, it only made us realize how much we truly meant to each other. Somehow, through all the hurt and confusion, our hearts kept finding their way back to each other.</p></div>
+        <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+        <div class="tl-empty"></div>
+      </div>
+      <div class="timeline-item">
+        <div class="tl-content"><p class="tl-date">One Year</p><h3 class="tl-title">Us, Still</h3><p class="tl-desc">I know that you may never truly be mine in the way I've always imagined. But even knowing all of that, I still choose you again and again — because being with you, in whatever way I can, means everything to me. Every time I see you smile, it feels like I've achieved something meaningful in life. And all I truly want is to keep that beautiful smile on your face for as long as I can.</p></div>
+        <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+        <div class="tl-empty"></div>
       </div>
     </div>
-
-    <div class="timeline-item">
-      <div class="tl-content">
-        <p class="tl-date">The Anniversary Phase</p>
-        <h3 class="tl-title">Next Few Months</h3>
-        <p class="tl-desc">And then came the last few month the ones that tested us in ways we never expected. We fought, we misunderstood each other, we tried to stay away, thinking maybe distance would make things easier but it never did. Instead, it only made us realize how much we truly meant to each other. There were nights filled with tears, moments of silence that felt heavier than words, and days where everything seemed uncertain. But even in all that pain, one thing never changed we never stopped caring, never stopped feeling, never truly let go. Somehow, through all the hurt and confusion, our hearts kept finding their way back to each other. And maybe that's what makes us real. not that we never broke, but that even after breaking, we chose each other again and again.</p>
+  </section>
+  <div class="divider"><span class="divider-symbol">✦</span></div>
+  <section id="gallery">
+    <div class="section-header"><span class="section-label">Moments Captured</span><h2 class="section-title">Our Gallery</h2></div>
+    <div class="gallery-grid">
+      <div class="gallery-card"><img src="/assets/img-1.jpg" alt="Our first photo"></div>
+      <div class="gallery-card"><img src="/assets/img-2.png" alt="Our second photo"></div>
+      <div class="gallery-card"><img src="/assets/img-3.png" alt="Our third photo"></div>
+      <div class="gallery-card"><img src="/assets/img-4.png" alt="Our fourth photo"></div>
+      <div class="gallery-card"><img src="/assets/img-5.png" alt="Our fifth photo"></div>
+      <div class="gallery-card"><img src="/assets/img-6.png" alt="Our sixth photo"></div>
+      <div class="gallery-card"><img src="/assets/img-7.png" alt="Our seventh photo"></div>
+      <div class="gallery-card"><img src="/assets/img-8.png" alt="Our eighth photo"></div>
+    </div>
+  </section>
+  <div class="divider"><span class="divider-symbol">✦</span></div>
+  <section id="letters">
+    <div class="section-header"><span class="section-label">Words from the Heart</span><h2 class="section-title">Letter For you</h2></div>
+    <div class="letters-wrap">
+      <div class="letter-card">
+        <p class="letter-from">From my heart to yours ✦</p>
+        <p class="letter-body">Every morning I wake up and the first thought that drifts into my mind is you. Not the idea of you, but the sound of your laugh, the way your eyes crinkle when something genuinely catches you off guard. The miles between us are real, but they have never once made me feel like you are far. You are the closest thing I know.<br><br>Jadu Hai Teri Har Ek Baat Me.<br>Yaad Bahut Aate Ho Din Aur Raat Me.<br>Kal Jab Dekha Tha Mene Sapna Raat Me.<br>Tab Bhi Apka Hi Hath Tha Mere Hath Me...!!!</p>
+        <span class="letter-sign">Always yours</span>
       </div>
-      <div class="tl-dot"><div class="tl-dot-inner"></div></div>
-      <div class="tl-empty"></div>
+      <div id="extra-letters"></div>
     </div>
+  </section>
+  <footer>
+    <p class="big-msg">Here's to forever,<br>one midnight call at a time.</p>
+    <div class="hearts">❤ &nbsp; ❤ &nbsp; ❤</div>
+    <small style="font-weight:800;color:#d4789a;">Made with Care — One Year &amp; Counting ✦</small>
+  </footer>
+</div>
 
-    <div class="timeline-item">
-      <div class="tl-content">
-        <p class="tl-date">One Year</p>
-        <h3 class="tl-title">Us, Still</h3>
-        <p class="tl-desc">I know that you may never truly be mine in the way I've always imagined, I know that the life I dream of with you might never fully exist, and I understand the reality of everything we are facing. But even knowing all of that, I still choose you again and again because being with you, in whatever way I can, means everything to me. Every time I see you smile, it feels like I've achieved something meaningful in life. Every moment of peace we share makes me feel like the happiest person in the world. And I just wish that this feeling, this connection, never fades away.
-          <br><br>
-          Please never think that you aren't giving me enough because you are giving me more than I could ever ask for. Your time, your care, your emotions… they mean more to me than anything else ever could. You make me feel complete in a way I never thought possible. And all I truly want is to keep that beautiful smile on your face for as long as I can, to protect the peace we've built together, and to hold onto this for as many years as life allows us.</p>
-      </div>
-      <div class="tl-dot"><div class="tl-dot-inner"></div></div>
-      <div class="tl-empty"></div>
-    </div>
-
-  </div>
-</section>
-
-<!-- ── GALLERY ── -->
-<div class="divider"><span class="divider-symbol">✦</span></div>
-<section id="gallery">
-  <div class="section-header">
-    <span class="section-label">Moments Captured</span>
-    <h2 class="section-title">Our Gallery</h2>
-  </div>
-  <div class="gallery-grid" id="gallery-grid">
-
-    <div class="gallery-card">
-      <img src="/assets/Img-1.png" alt="Our first photo together" class="gallery-img">
-    </div>
-    <div class="gallery-card">
-      <img src="/assets/img-2.png" alt="Our second photo" class="gallery-img">
-    </div>
-    <div class="gallery-card">
-      <img src="/assets/img-3.png" alt="Our third photo" class="gallery-img">
-    </div>
-    <div class="gallery-card">
-      <img src="/assets/img-4.png" alt="Our fourth photo" class="gallery-img">
-    </div>
-    <div class="gallery-card">
-      <img src="/assets/img-5.png" alt="Our fifth photo" class="gallery-img">
-    </div>
-
-  </div>
-</section>
-
-<!-- ── LOVE LETTERS ── -->
-<div class="divider"><span class="divider-symbol">✦</span></div>
-<section id="letters">
-  <div class="section-header">
-    <span class="section-label">Words from the Heart</span>
-    <h2 class="section-title">Letter For you</h2>
-  </div>
-  <div class="letters-wrap">
-
-    <div class="letter-card">
-      <p class="letter-from">From my heart to yours ✦</p>
-      <p class="letter-body">
-        Every morning I wake up and the first thought that drifts into my mind is you.
-        Not the idea of you, but the sound of your laugh, the way your eyes crinkle when something genuinely catches you off guard.
-        The miles between us are real, but they have never once made me feel like you are far. You are the closest thing I know.
-          <br><br>
-        Khwabo ki duniya mein hum Khote gye.<br>
-        Hosh me the fir bhi madhosh hote gaye.<br>
-        Jane kya jadu tha us ajnabi chehre mein.<br>
-        Khud ko roka bohot fir bhi uske hote gye.!!!<br>
-      </p>
-      <span class="letter-sign"> Always yours</span>
-    </div>
-
-    <div id="extra-letters"></div>
-
-  </div>
-</section>
-
-<!-- ── FOOTER ── -->
-<footer>
-  <p class="big-msg">Here's to forever,<br>one midnight call at a time.</p>
-  <div class="hearts">♡ &nbsp; ♡ &nbsp; ♡</div>
-  <small style="font-weight: 800; color: #d4789a;">Made with hate — One Year & Counting ✦</small>
-</footer>
-
-<!-- ── LETTER MODAL ── -->
 <div class="modal-overlay" id="letterModal">
   <div class="modal">
     <button class="close-modal" onclick="closeLetterModal()">✕</button>
@@ -906,312 +406,530 @@
 </div>
 
 <script>
-/* ────────── STARFIELD ────────── */
-const canvas = document.getElementById('starfield');
-const ctx = canvas.getContext('2d');
-let stars = [];
+/* ════════════════════════════════════════
+   PASSWORD LOGIC
+════════════════════════════════════════ */
+const CORRECT_PIN = '12042025';
+let pwEntered = '', pwLocked = false;
+const pwInput    = document.getElementById('pw-input');
+const pwError    = document.getElementById('pw-error');
+const pwUnlocked = document.getElementById('pw-unlocked');
+const pwLockIcon = document.getElementById('pw-lock-icon');
+const pwTap      = document.getElementById('pw-tap');
+const pwScreen   = document.getElementById('password-screen');
 
-function resize() {
-  canvas.width = innerWidth;
-  canvas.height = innerHeight;
+function focusPwInput(){ pwInput.focus(); }
+pwScreen.addEventListener('click', focusPwInput);
+setTimeout(focusPwInput, 500);
+
+function updateDots(state){
+  for(let i=0;i<8;i++){
+    const d = document.getElementById('pwd'+i);
+    d.className = 'pw-dot';
+    if(state==='error')        d.classList.add('error');
+    else if(state==='success') d.classList.add('success');
+    else if(i < pwEntered.length) d.classList.add('filled');
+  }
 }
 
-function initStars() {
-  stars = [];
-  const count = Math.floor((innerWidth * innerHeight) / 2200);
-  const colors = [
-    [240,238,255],
-    [255,240,200],
-    [210,220,255],
-    [255,210,230],
+pwInput.addEventListener('input', ()=>{
+  if(pwLocked) return;
+  const val = pwInput.value.replace(/\D/g,'').slice(0,8);
+  pwInput.value = val; pwEntered = val;
+  pwError.classList.remove('show');
+  updateDots('normal');
+  if(pwEntered.length === 8){
+    pwLocked = true;
+    if(pwEntered === CORRECT_PIN){
+      updateDots('success');
+      pwLockIcon.textContent = '🔓';
+      stopTrainLoop();
+      setTimeout(()=>{ pwTap.style.display='none'; pwUnlocked.classList.add('show'); }, 500);
+      setTimeout(()=>{
+        pwScreen.classList.add('unlock-out');
+        document.getElementById('site-content').classList.add('revealed');
+        initSiteAnimations();
+      }, 1800);
+      setTimeout(()=>{ pwScreen.remove(); }, 2800);
+    } else {
+      updateDots('error');
+      pwError.classList.add('show');
+      setTimeout(()=>{
+        pwEntered=''; pwInput.value='';
+        updateDots('normal'); pwLocked=false;
+        pwError.classList.remove('show');
+        focusPwInput();
+      }, 1000);
+    }
+  }
+});
+pwInput.addEventListener('keydown', e=>{
+  if(e.key==='Backspace' && pwEntered.length>0){
+    pwEntered=pwEntered.slice(0,-1); pwInput.value=pwEntered;
+    updateDots('normal'); pwError.classList.remove('show');
+  }
+});
+
+/* ════════════════════════════════════════
+   PASSWORD SCREEN STARFIELD
+════════════════════════════════════════ */
+const pwSC = document.getElementById('pw-stars');
+const pwSX = pwSC.getContext('2d');
+let pwStars = [];
+function resizePwStars(){ pwSC.width=innerWidth; pwSC.height=innerHeight; }
+resizePwStars();
+function initPwStars(){
+  pwStars=[];
+  const n=Math.floor(pwSC.width*pwSC.height/2600);
+  for(let i=0;i<n;i++) pwStars.push({
+    x:Math.random()*pwSC.width, y:Math.random()*pwSC.height*0.8,
+    r:Math.random()*1.4+0.3, a:Math.random()*0.55+0.3,
+    f:Math.random()*0.7+0.3, p:Math.random()*Math.PI*2
+  });
+}
+initPwStars();
+function drawMoon(ctx, W, H){
+  // Moon sits in top-right corner, below the route heading
+  const mx = W * 0.88, my = H * 0.38, mr = Math.min(W*0.07, H*0.1, 48);
+  // outer glow
+  const glow = ctx.createRadialGradient(mx,my,mr*0.6, mx,my,mr*2.8);
+  glow.addColorStop(0,'rgba(240,230,180,0.13)');
+  glow.addColorStop(0.4,'rgba(220,200,140,0.06)');
+  glow.addColorStop(1,'rgba(200,180,110,0)');
+  ctx.fillStyle=glow;
+  ctx.beginPath(); ctx.arc(mx,my,mr*2.8,0,Math.PI*2); ctx.fill();
+
+  // moon disc
+  const disc = ctx.createRadialGradient(mx-mr*0.25,my-mr*0.2,mr*0.1, mx,my,mr);
+  disc.addColorStop(0,'rgba(255,252,220,0.98)');
+  disc.addColorStop(0.55,'rgba(245,235,185,0.97)');
+  disc.addColorStop(1,'rgba(220,200,140,0.9)');
+  ctx.fillStyle=disc;
+  ctx.beginPath(); ctx.arc(mx,my,mr,0,Math.PI*2); ctx.fill();
+
+  // subtle craters
+  const craters=[
+    {ox:-0.28,oy:0.18,r:0.13},{ox:0.2,oy:-0.3,r:0.09},
+    {ox:0.1,oy:0.35,r:0.07},{ox:-0.1,oy:-0.15,r:0.05}
   ];
-  for (let i = 0; i < count; i++) {
-    const c = colors[Math.floor(Math.random() * colors.length)];
-    stars.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      r: Math.random() * 1.6 + 0.3,
-      baseAlpha: Math.random() * 0.5 + 0.4,
-      color: c,
-      f1: Math.random() * 0.6 + 0.3,
-      p1: Math.random() * Math.PI * 2,
-      a1: Math.random() * 0.4 + 0.1,
-      f2: Math.random() * 2 + 1,
-      p2: Math.random() * Math.PI * 2,
-      a2: Math.random() * 0.15,
-      rPulse: Math.random() * 0.5,
-      rPhase: Math.random() * Math.PI * 2,
-      rFreq: Math.random() * 0.4 + 0.1,
-      glow: Math.random() > 0.75,
+  craters.forEach(c=>{
+    ctx.beginPath(); ctx.arc(mx+c.ox*mr, my+c.oy*mr, c.r*mr, 0, Math.PI*2);
+    ctx.fillStyle='rgba(190,175,120,0.18)'; ctx.fill();
+  });
+
+  // rim shimmer
+  ctx.beginPath(); ctx.arc(mx,my,mr,0,Math.PI*2);
+  ctx.strokeStyle='rgba(255,250,210,0.25)'; ctx.lineWidth=1.5; ctx.stroke();
+}
+
+function pwStarLoop(t){
+  pwSX.clearRect(0,0,pwSC.width,pwSC.height);
+  drawMoon(pwSX, pwSC.width, pwSC.height);
+  pwStars.forEach(s=>{
+    const alpha=s.a+Math.sin(t*s.f+s.p)*0.18;
+    pwSX.beginPath(); pwSX.arc(s.x,s.y,s.r,0,Math.PI*2);
+    pwSX.fillStyle=`rgba(240,238,255,${Math.max(0.04,alpha)})`; pwSX.fill();
+  });
+  requestAnimationFrame(ts=>pwStarLoop(ts/1000));
+}
+requestAnimationFrame(ts=>pwStarLoop(ts/1000));
+window.addEventListener('resize',()=>{ resizePwStars(); initPwStars(); });
+
+/* ════════════════════════════════════════
+   TRAIN ANIMATION
+   ─────────────────────────────────────
+   Train moves LEFT → RIGHT (trainX increases).
+   trainX = the NOSE (right-most leading tip) of the engine.
+   Engine body extends LEFTWARD from trainX.
+   Coaches trail further LEFT behind the engine.
+
+   Physical layout (offsets from trainX, all NEGATIVE = leftward):
+     nose/cowcatcher : trainX          (rightmost point, front)
+     boiler          : trainX-14  to  trainX-74
+     chimney         : trainX-60  (near front of boiler)
+     cab             : trainX-74  to  trainX-108  (rear of loco)
+     coach 1         : trainX-114 to  trainX-200
+     coach 2         : trainX-206 to  trainX-292
+     coach 3         : trainX-298 to  trainX-384
+   Total width ≈ 390px  → start trainX at -20 (nose just off-screen left)
+════════════════════════════════════════ */
+const tc   = document.getElementById('pw-train-canvas');
+const tctx = tc.getContext('2d');
+let trainLoopRunning = true;
+
+// Train width = 108 (loco) + 6 (gap) + 3×(86+6) = 390
+const TOTAL_W   = 390;
+const TRAIN_SPEED = 1.4;
+let trainX = -20;   // nose starts just off left edge
+let smoke  = [];
+let fc     = 0;
+
+function resizeTC(){
+  tc.width=innerWidth;
+  tc.height = innerWidth < 480 ? 160 : 200;
+}
+resizeTC();
+window.addEventListener('resize', resizeTC);
+function stopTrainLoop(){ trainLoopRunning=false; }
+
+/* ── station ── */
+function drawStation(ctx, cx, label, H){
+  const mobile = tc.width < 480;
+  const scale  = mobile ? 0.72 : 1;
+  const groundY=H-28;
+  const bw=60*scale, bh=52*scale, bx=cx-bw/2, by=groundY-bh;
+  ctx.fillStyle='#100e28'; ctx.strokeStyle='#c8a96e'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.roundRect(bx,by,bw,bh,[4,4,0,0]); ctx.fill(); ctx.stroke();
+  ctx.fillStyle='#1c1836'; ctx.strokeStyle='#c8a96e'; ctx.lineWidth=0.9;
+  ctx.beginPath(); ctx.moveTo(bx-4*scale,by); ctx.lineTo(cx,by-18*scale); ctx.lineTo(bx+bw+4*scale,by); ctx.closePath(); ctx.fill(); ctx.stroke();
+  ctx.fillStyle='#100e28'; ctx.strokeStyle='#c8a96e'; ctx.lineWidth=0.7;
+  ctx.beginPath(); ctx.roundRect(cx-7*scale,by-34*scale,14*scale,18*scale,2); ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx,by-26*scale,4.5*scale,0,Math.PI*2);
+  ctx.fillStyle='rgba(200,169,110,0.18)'; ctx.strokeStyle='#c8a96e'; ctx.lineWidth=0.6; ctx.fill(); ctx.stroke();
+  ctx.strokeStyle='rgba(200,169,110,0.7)'; ctx.lineWidth=0.7;
+  ctx.beginPath(); ctx.moveTo(cx,by-26*scale); ctx.lineTo(cx,by-29.5*scale); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx,by-26*scale); ctx.lineTo(cx+2.5*scale,by-26*scale); ctx.stroke();
+  for(let i=0;i<3;i++){
+    const wx=bx+7*scale+i*17*scale, wy=by+10*scale;
+    ctx.fillStyle='rgba(200,169,110,0.08)'; ctx.strokeStyle='#c8a96e'; ctx.lineWidth=0.6;
+    ctx.beginPath(); ctx.roundRect(wx,wy,11*scale,16*scale,[5,5,0,0]); ctx.fill(); ctx.stroke();
+  }
+  ctx.fillStyle='rgba(200,169,110,0.07)'; ctx.strokeStyle='#c8a96e'; ctx.lineWidth=0.7;
+  ctx.beginPath(); ctx.roundRect(cx-7*scale,by+bh-20*scale,14*scale,20*scale,[3,3,0,0]); ctx.fill(); ctx.stroke();
+  ctx.fillStyle='#18163a'; ctx.strokeStyle='rgba(200,169,110,0.3)'; ctx.lineWidth=0.5;
+  ctx.fillRect(bx-12*scale,groundY-7,bw+24*scale,7); ctx.strokeRect(bx-12*scale,groundY-7,bw+24*scale,7);
+  const nw=Math.max(bw+10, label.length*6*scale+18);
+  ctx.fillStyle='rgba(8,6,22,0.9)'; ctx.strokeStyle='#c8a96e'; ctx.lineWidth=0.7;
+  ctx.beginPath(); ctx.roundRect(cx-nw/2,by-55*scale,nw,14,3); ctx.fill(); ctx.stroke();
+  ctx.fillStyle='#c8a96e'; ctx.font=`600 ${mobile?6.5:8}px "Cinzel",serif`;
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(label,cx,by-48*scale);
+}
+
+/* ── wheel helper ── */
+function drawWheel(ctx, wx, wy, r){
+  ctx.beginPath(); ctx.arc(wx,wy,r,0,Math.PI*2);
+  ctx.fillStyle='#16143a'; ctx.strokeStyle='#c8a96e'; ctx.lineWidth=r>8?1.2:0.9;
+  ctx.fill(); ctx.stroke();
+  const spokes=r>8?6:4;
+  for(let s=0;s<spokes;s++){
+    const ang=(s/spokes)*Math.PI*2+fc*0.05;
+    ctx.strokeStyle='rgba(200,169,110,0.45)'; ctx.lineWidth=0.7;
+    ctx.beginPath(); ctx.moveTo(wx,wy);
+    ctx.lineTo(wx+Math.cos(ang)*(r-1.5),wy+Math.sin(ang)*(r-1.5));
+    ctx.stroke();
+  }
+  ctx.beginPath(); ctx.arc(wx,wy,r>8?3:2,0,Math.PI*2);
+  ctx.fillStyle='#c8a96e'; ctx.fill();
+}
+
+/* ══════════════════════════════════════════
+   drawTrain(ctx, nose, H)
+   nose = x-coordinate of the FRONT TIP of the engine.
+   Engine occupies [nose-108 … nose].
+   Coaches trail to the LEFT: [nose-114 … nose-384].
+   Everything is drawn relative to `nose`.
+══════════════════════════════════════════ */
+function drawTrain(ctx, nose, H){
+  const groundY = H-28;
+  const rail    = groundY-4;  // y where wheels sit
+  const boilerY = rail-36;    // top of boiler body
+
+  /* ── 3 COACHES — trailing to the LEFT of the engine ─────────────
+     Coach 0 (closest to engine) : nose-114  to  nose-114-86 = nose-200
+     Coach 1                     : nose-206  to  nose-292
+     Coach 2 (rear of train)     : nose-298  to  nose-384              */
+  const CW=86, CGAP=6, LOCO_W=108;
+  const coachPalette=['#161432','#1a1838','#181634'];
+
+  for(let c=0;c<3;c++){
+    // right edge of this coach (closest edge toward the engine)
+    const cRight = nose - LOCO_W - CGAP - c*(CW+CGAP);
+    const cLeft  = cRight - CW;
+    const cy     = rail-32;
+
+    // body
+    ctx.fillStyle=coachPalette[c]; ctx.strokeStyle='#c8a96e'; ctx.lineWidth=0.9;
+    ctx.beginPath(); ctx.roundRect(cLeft,cy,CW,28,[4,4,0,0]); ctx.fill(); ctx.stroke();
+    // roof
+    ctx.fillStyle='#22204e'; ctx.strokeStyle='#7a6340'; ctx.lineWidth=0.5;
+    ctx.beginPath(); ctx.roundRect(cLeft+2,cy,CW-4,5,[3,3,0,0]); ctx.fill(); ctx.stroke();
+    // 4 windows
+    const winW=12, winH=10, winY=cy+7, ws=(CW-16)/5;
+    for(let w=0;w<4;w++){
+      const wxx=cLeft+8+w*ws;
+      ctx.fillStyle='rgba(200,169,110,0.08)'; ctx.strokeStyle='#c8a96e'; ctx.lineWidth=0.6;
+      ctx.beginPath(); ctx.roundRect(wxx,winY,winW,winH,2); ctx.fill(); ctx.stroke();
+      ctx.strokeStyle='rgba(200,169,110,0.25)'; ctx.lineWidth=0.4;
+      ctx.beginPath(); ctx.moveTo(wxx+winW/2,winY); ctx.lineTo(wxx+winW/2,winY+winH); ctx.stroke();
+    }
+    // coach badge
+    ctx.fillStyle='rgba(200,169,110,0.14)'; ctx.strokeStyle='#c8a96e'; ctx.lineWidth=0.4;
+    ctx.beginPath(); ctx.roundRect(cLeft+5,cy+19,20,7,1); ctx.fill(); ctx.stroke();
+    ctx.fillStyle='#c8a96e'; ctx.font='500 5.5px "Cinzel",serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('S'+(c+1),cLeft+15,cy+22.5);
+    // bogies
+    [cLeft+13, cLeft+CW-13].forEach(bx2=>{
+      drawWheel(ctx,bx2,rail,7);
+      ctx.fillStyle='#1c1a40'; ctx.strokeStyle='#7a6340'; ctx.lineWidth=0.5;
+      ctx.beginPath(); ctx.roundRect(bx2-9,rail-9,18,6,1); ctx.fill(); ctx.stroke();
+    });
+    // coupling to right neighbour (engine or previous coach)
+    const coupR = (c===0) ? nose-LOCO_W : nose-LOCO_W-CGAP-c*(CW+CGAP)+CGAP;
+    ctx.strokeStyle='rgba(200,169,110,0.4)'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(cRight,rail-10); ctx.lineTo(cRight+CGAP,rail-10); ctx.stroke();
+  }
+
+  /* ── LOCOMOTIVE — occupies [nose-108 … nose] ─────────────────────
+     nose        = right tip = cowcatcher/headlight (FRONT, facing RIGHT)
+     nose-14     = front buffer plate inner edge
+     nose-14..nose-74 = boiler body (60px wide)
+     chimney at  nose-20 (near front of boiler)
+     cab at      nose-74..nose-108 (REAR, leftmost)                   */
+
+  // CAB (rear = left side of loco)
+  const cabRight = nose-74, cabLeft = nose-108;
+  const cabY     = boilerY-8;
+  ctx.fillStyle='#181630'; ctx.strokeStyle='#c8a96e'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.roundRect(cabLeft,cabY,34,36,[5,5,0,0]); ctx.fill(); ctx.stroke();
+  // cab roof
+  ctx.fillStyle='#26224a'; ctx.strokeStyle='#7a6340'; ctx.lineWidth=0.7;
+  ctx.beginPath(); ctx.roundRect(cabLeft-3,cabY-7,40,9,[3,3,0,0]); ctx.fill(); ctx.stroke();
+  // cab windows
+  ctx.fillStyle='rgba(200,169,110,0.1)'; ctx.strokeStyle='#c8a96e'; ctx.lineWidth=0.7;
+  ctx.beginPath(); ctx.roundRect(cabLeft+4,cabY+5,14,12,2); ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.roundRect(cabLeft+21,cabY+5,9,12,2); ctx.fill(); ctx.stroke();
+
+  // BOILER BODY (nose-74 to nose-14)
+  ctx.fillStyle='#1c1a3c'; ctx.strokeStyle='#c8a96e'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.roundRect(nose-74,boilerY,62,26,[2,8,2,2]); ctx.fill(); ctx.stroke();
+  // boiler bands
+  for(let b=1;b<=3;b++){
+    ctx.strokeStyle='rgba(200,169,110,0.2)'; ctx.lineWidth=0.8;
+    ctx.beginPath(); ctx.moveTo(nose-74+b*14,boilerY); ctx.lineTo(nose-74+b*14,boilerY+26); ctx.stroke();
+  }
+  // steam dome (middle-rear of boiler)
+  ctx.fillStyle='#28244e'; ctx.strokeStyle='#c8a96e'; ctx.lineWidth=0.8;
+  ctx.beginPath(); ctx.ellipse(nose-52,boilerY+1,9,7,0,Math.PI,0); ctx.fill(); ctx.stroke();
+  // sandbox dome (toward front)
+  ctx.beginPath(); ctx.ellipse(nose-36,boilerY+1,6,5,0,Math.PI,0); ctx.fill(); ctx.stroke();
+
+  // CHIMNEY — at nose-22 (front quarter of boiler, near the front)
+  const chX=nose-28, chY=boilerY-18;
+  ctx.fillStyle='#0e0c24'; ctx.strokeStyle='#c8a96e'; ctx.lineWidth=0.9;
+  ctx.beginPath(); ctx.roundRect(chX,chY,13,18,2); ctx.fill(); ctx.stroke();
+  // flared cap
+  ctx.beginPath(); ctx.roundRect(chX-4,chY-3,21,6,3); ctx.fill(); ctx.stroke();
+
+  // FRONT BUFFER PLATE (at nose-14..nose-9, right face of boiler)
+  ctx.fillStyle='#0e0c24'; ctx.strokeStyle='#c8a96e'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.roundRect(nose-9,boilerY+4,6,18,1); ctx.fill(); ctx.stroke();
+
+  // COWCATCHER — slopes from nose-9 rightward/downward to nose+2
+  // Points to the RIGHT (direction of travel = forward)
+  ctx.fillStyle='#181630'; ctx.strokeStyle='#c8a96e'; ctx.lineWidth=0.8;
+  ctx.beginPath();
+  ctx.moveTo(nose-9, boilerY+6);   // top-left of cowcatcher
+  ctx.lineTo(nose+2, boilerY+20);  // bottom-right tip (furthest right = front)
+  ctx.lineTo(nose+2, boilerY+26);  // bottom-right base
+  ctx.lineTo(nose-9, boilerY+26);  // bottom-left
+  ctx.closePath(); ctx.fill(); ctx.stroke();
+  // cowcatcher slats
+  ctx.strokeStyle='rgba(200,169,110,0.32)'; ctx.lineWidth=0.5;
+  for(let s=1;s<=3;s++){
+    const t=s/4;
+    ctx.beginPath();
+    ctx.moveTo(nose-9,       boilerY+6+t*20);
+    ctx.lineTo(nose-9+11*t,  boilerY+26);
+    ctx.stroke();
+  }
+
+  // HEADLIGHT — on the right face (nose), the FRONT
+  ctx.beginPath(); ctx.arc(nose-3,boilerY+13,5.5,0,Math.PI*2);
+  ctx.fillStyle='rgba(255,245,170,0.6)'; ctx.fill();
+  ctx.strokeStyle='#c8a96e'; ctx.lineWidth=0.7; ctx.stroke();
+  // light beam spraying RIGHTWARD (forward)
+  const lg=ctx.createRadialGradient(nose-3,boilerY+13,0,nose-3,boilerY+13,50);
+  lg.addColorStop(0,'rgba(255,245,160,0.22)');
+  lg.addColorStop(1,'rgba(255,245,160,0)');
+  ctx.fillStyle=lg;
+  ctx.beginPath();
+  ctx.moveTo(nose-3,boilerY+7);
+  ctx.lineTo(nose+50,boilerY+3);
+  ctx.lineTo(nose+50,boilerY+23);
+  ctx.closePath(); ctx.fill();
+
+  // WHEELS
+  // small pilot wheel right at nose
+  drawWheel(ctx, nose-10, rail, 7);
+  // two big drive wheels under boiler
+  drawWheel(ctx, nose-36, rail, 12);
+  drawWheel(ctx, nose-62, rail, 12);
+  // connecting side rod between the two drive wheels
+  ctx.strokeStyle='#c8a96e'; ctx.lineWidth=2.5;
+  ctx.beginPath(); ctx.moveTo(nose-36,rail-6); ctx.lineTo(nose-62,rail-6); ctx.stroke();
+  // piston rod from pilot wheel to first drive wheel
+  ctx.strokeStyle='rgba(200,169,110,0.5)'; ctx.lineWidth=1.2;
+  ctx.beginPath(); ctx.moveTo(nose-10,rail-4); ctx.lineTo(nose-36,rail-4); ctx.stroke();
+  // trailing wheel under cab
+  drawWheel(ctx, nose-92, rail, 8);
+}
+
+/* ── smoke: chimney at nose-28+6 = nose-22 horizontally ── */
+function spawnSmoke(){
+  const H   = tc.height;
+  const rail= H-28-4;
+  // chimney tip x = trainX (nose) - 28 + 6 = trainX - 22
+  const tipX = trainX - 22;
+  const tipY = rail - 36 - 18 - 3;   // boilerY - chimneyH - cap
+  for(let i=0;i<2;i++){
+    smoke.push({
+      x: tipX+(Math.random()-.5)*4,
+      y: tipY,
+      vx: Math.random()*0.5+0.3,    // drifts backward (rightward = behind train) + spreads
+      vy:-(Math.random()*0.9+0.5),
+      r:  Math.random()*4+5,
+      alpha:0.52,
+      decay:Math.random()*0.007+0.005,
+      grow: Math.random()*0.22+0.08,
     });
   }
 }
 
-function drawStars(t) {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  stars.forEach(s => {
-    const twinkle = Math.sin(t * s.f1 + s.p1) * s.a1
-                  + Math.sin(t * s.f2 + s.p2) * s.a2;
-    const alpha = Math.max(0.05, Math.min(1, s.baseAlpha + twinkle));
-    const radius = s.r + Math.sin(t * s.rFreq + s.rPhase) * s.rPulse;
-    const [r,g,b] = s.color;
+function trainLoop(){
+  if(!trainLoopRunning) return;
+  const W=tc.width, H=tc.height;
+  tctx.clearRect(0,0,W,H);
+  const groundY=H-28;
 
-    if (s.glow && radius > 1) {
-      const grd = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, radius * 3.5);
-      grd.addColorStop(0, `rgba(${r},${g},${b},${alpha * 0.6})`);
-      grd.addColorStop(1, `rgba(${r},${g},${b},0)`);
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, radius * 3.5, 0, Math.PI * 2);
-      ctx.fillStyle = grd;
-      ctx.fill();
-    }
+  // ground glow
+  const grd=tctx.createLinearGradient(0,groundY-4,0,H);
+  grd.addColorStop(0,'rgba(28,24,58,0.55)'); grd.addColorStop(1,'transparent');
+  tctx.fillStyle=grd; tctx.fillRect(0,groundY-4,W,H-groundY+4);
 
-    ctx.beginPath();
-    ctx.arc(s.x, s.y, Math.max(0.1, radius), 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(${r},${g},${b},${alpha})`;
-    ctx.fill();
+  // sleepers
+  tctx.fillStyle='rgba(80,65,35,0.35)';
+  for(let sx=0;sx<W;sx+=20){
+    tctx.beginPath(); tctx.roundRect(sx,groundY-4,13,8,1); tctx.fill();
+  }
+  // rails
+  tctx.strokeStyle='rgba(200,169,110,0.55)'; tctx.lineWidth=2.5;
+  tctx.beginPath(); tctx.moveTo(0,groundY); tctx.lineTo(W,groundY); tctx.stroke();
+  tctx.strokeStyle='rgba(200,169,110,0.4)'; tctx.lineWidth=1.8;
+  tctx.beginPath(); tctx.moveTo(0,groundY+7); tctx.lineTo(W,groundY+7); tctx.stroke();
+  // rail bolts
+  tctx.fillStyle='rgba(200,169,110,0.3)';
+  for(let bx=15;bx<W;bx+=55){
+    [groundY,groundY+7].forEach(by=>{ tctx.beginPath(); tctx.arc(bx,by,2,0,Math.PI*2); tctx.fill(); });
+  }
+
+  // stations — keep both fully inside the canvas
+  const puneX   = Math.round(W*0.12) + 30;
+  const mumbaiX = Math.min(Math.round(W*0.85), W - 55);
+  drawStation(tctx, puneX,   'PUNE',   H);
+  drawStation(tctx, mumbaiX, 'MUMBAI', H);
+
+  // smoke
+  if(fc%5===0) spawnSmoke();
+  smoke=smoke.filter(p=>p.alpha>0.015);
+  smoke.forEach(p=>{
+    p.x+=p.vx; p.y+=p.vy; p.r+=p.grow; p.alpha-=p.decay;
+    tctx.beginPath(); tctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    tctx.fillStyle=`rgba(185,180,210,${p.alpha})`; tctx.fill();
   });
-}
 
-function shootingStar() {
-  const el = document.createElement('div');
-  el.className = 'shooting-star';
-  el.style.cssText = `
-    top: ${Math.random() * 60}%;
-    left: ${Math.random() * 80}%;
-    animation: shoot 1.2s ease-out forwards;
-  `;
-  document.body.appendChild(el);
-  setTimeout(() => el.remove(), 1400);
-}
+  // draw train — trainX is the NOSE (leading right tip)
+  drawTrain(tctx, trainX, H);
 
-const shootStyle = document.createElement('style');
-shootStyle.textContent = `
-  @keyframes shoot {
-    0%  { transform: translate(0,0) rotate(-35deg); opacity: 1; }
-    100%{ transform: translate(220px, 120px) rotate(-35deg); opacity: 0; }
+  // advance nose to the right
+  trainX += TRAIN_SPEED;
+  // reset when the tail (nose - totalWidth) clears the right edge
+  if(trainX > W + TOTAL_W + 30) trainX = -30;
+
+  fc++;
+  requestAnimationFrame(trainLoop);
+}
+trainLoop();
+
+/* ════════════════════════════════════════
+   SITE ANIMATIONS
+════════════════════════════════════════ */
+function initSiteAnimations(){
+  const canvas=document.getElementById('starfield');
+  const ctx=canvas.getContext('2d');
+  let stars=[];
+  function resizeStar(){ canvas.width=innerWidth; canvas.height=innerHeight; }
+  function initStars(){
+    stars=[];
+    const count=Math.floor((innerWidth*innerHeight)/2200);
+    const colors=[[240,238,255],[255,240,200],[210,220,255],[255,210,230]];
+    for(let i=0;i<count;i++){
+      const c=colors[Math.floor(Math.random()*colors.length)];
+      stars.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*1.6+0.3,baseAlpha:Math.random()*0.5+0.4,color:c,f1:Math.random()*0.6+0.3,p1:Math.random()*Math.PI*2,a1:Math.random()*0.4+0.1,f2:Math.random()*2+1,p2:Math.random()*Math.PI*2,a2:Math.random()*0.15,rPulse:Math.random()*0.5,rPhase:Math.random()*Math.PI*2,rFreq:Math.random()*0.4+0.1,glow:Math.random()>0.75});
+    }
   }
-`;
-document.head.appendChild(shootStyle);
-
-setInterval(() => { if (Math.random() < 0.5) shootingStar(); }, 3500);
-
-let raf;
-function starLoop(t) {
-  drawStars(t / 1000);
-  raf = requestAnimationFrame(starLoop);
-}
-
-resize(); initStars(); requestAnimationFrame(starLoop);
-window.addEventListener('resize', () => { resize(); initStars(); });
-
-
-/* ────────── SCROLL REVEAL ────────── */
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-}, { threshold: 0.15 });
-
-document.querySelectorAll('.timeline-item, .letter-card, .gallery-card').forEach(el => observer.observe(el));
-
-
-/* ────────── PHOTO UPLOAD ────────── */
-function loadPhoto(input) {
-  const card = input.closest('.gallery-card');
-  const file = input.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    card.querySelector('.photo-placeholder')?.remove();
-    let img = card.querySelector('img');
-    if (!img) {
-      img = document.createElement('img');
-      card.insertBefore(img, card.querySelector('.caption'));
-    }
-    img.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
-}
-
-
-/* ────────── LETTER MODAL ────────── */
-function openLetterModal() {
-  document.getElementById('letterModal').classList.add('open');
-}
-function closeLetterModal() {
-  document.getElementById('letterModal').classList.remove('open');
-  ['lFrom','lBody','lSign'].forEach(id => document.getElementById(id).value = '');
-}
-function saveLetter() {
-  const from = document.getElementById('lFrom').value.trim();
-  const body = document.getElementById('lBody').value.trim();
-  const sign = document.getElementById('lSign').value.trim();
-  if (!body) return;
-
-  const card = document.createElement('div');
-  card.className = 'letter-card visible';
-  card.innerHTML = `
-    ${from ? `<p class="letter-from">${from} ✦</p>` : ''}
-    <p class="letter-body">${body.replace(/\n/g,'<br>')}</p>
-    ${sign ? `<span class="letter-sign">— ${sign}</span>` : ''}
-  `;
-  document.getElementById('extra-letters').appendChild(card);
-  closeLetterModal();
-}
-
-document.getElementById('letterModal').addEventListener('click', function(e) {
-  if (e.target === this) closeLetterModal();
-});
-
-
-/* ────────── ANNIVERSARY CONFETTI ────────── */
-(function(){
-  const cc = document.getElementById('confetti-canvas');
-  const cx = cc.getContext('2d');
-  cc.width = innerWidth; cc.height = innerHeight;
-  window.addEventListener('resize', () => { cc.width = innerWidth; cc.height = innerHeight; });
-
-  const COLORS = [
-    '#c8a96e','#f0eeff','#d4789a','#6b5b9e',
-    '#e8c99a','#f7d6e6','#a898d8','#ffecd2',
-    '#ffffff','#ffe0b2'
-  ];
-  const SHAPES = ['rect','circle','star','heart','diamond'];
-
-  function rnd(a,b){ return a + Math.random()*(b-a); }
-
-  class Piece {
-    constructor(burst){
-      const bx = burst ? burst.x : rnd(0.1, 0.9) * cc.width;
-      const by = burst ? burst.y : -20;
-      this.x = bx + rnd(-100, 100);
-      this.y = by;
-      this.vx = burst ? rnd(-8, 8) : rnd(-3, 3);
-      this.vy = burst ? rnd(-16, -5) : rnd(1.5, 5);
-      this.gravity = 0.2;
-      this.size = rnd(5, 13);
-      this.color = COLORS[Math.floor(Math.random()*COLORS.length)];
-      this.shape = SHAPES[Math.floor(Math.random()*SHAPES.length)];
-      this.rotation = rnd(0, Math.PI*2);
-      this.spin = rnd(-0.18, 0.18);
-      this.alpha = 1;
-      this.decay = rnd(0.007, 0.013);
-      this.wobble = rnd(0, Math.PI*2);
-      this.wobbleSpeed = rnd(0.04, 0.1);
-      this.scaleX = 1;
-      this.scaleDir = rnd(-0.03, 0.03);
-    }
-    update(){
-      this.wobble += this.wobbleSpeed;
-      this.vx += Math.sin(this.wobble) * 0.08;
-      this.vy += this.gravity;
-      this.x += this.vx; this.y += this.vy;
-      this.rotation += this.spin;
-      this.alpha -= this.decay;
-      this.scaleX += this.scaleDir;
-      if(this.scaleX > 1 || this.scaleX < 0.1) this.scaleDir *= -1;
-    }
-    draw(){
-      cx.save();
-      cx.globalAlpha = Math.max(0, this.alpha);
-      cx.translate(this.x, this.y);
-      cx.rotate(this.rotation);
-      cx.scale(this.scaleX, 1);
-      cx.fillStyle = this.color;
-
-      const s = this.size;
-      if(this.shape === 'rect'){
-        cx.fillRect(-s/2, -s*0.3, s, s*0.6);
-      } else if(this.shape === 'circle'){
-        cx.beginPath(); cx.arc(0,0,s/2,0,Math.PI*2); cx.fill();
-      } else if(this.shape === 'diamond'){
-        cx.beginPath();
-        cx.moveTo(0,-s/2); cx.lineTo(s/2,0);
-        cx.lineTo(0,s/2); cx.lineTo(-s/2,0);
-        cx.closePath(); cx.fill();
-      } else if(this.shape === 'star'){
-        let rot = -Math.PI/2, step = Math.PI/5;
-        cx.beginPath(); cx.moveTo(0,-s/2);
-        for(let i=0;i<5;i++){
-          cx.lineTo(Math.cos(rot)*s/2, Math.sin(rot)*s/2); rot+=step;
-          cx.lineTo(Math.cos(rot)*s/4, Math.sin(rot)*s/4); rot+=step;
-        }
-        cx.closePath(); cx.fill();
-      } else {
-        // heart
-        cx.beginPath();
-        cx.moveTo(0, s*0.25);
-        cx.bezierCurveTo(s*0.25, -s*0.25, s*0.8, s*0.1, 0, s*0.8);
-        cx.bezierCurveTo(-s*0.8, s*0.1, -s*0.25, -s*0.25, 0, s*0.25);
-        cx.closePath(); cx.fill();
-      }
-      cx.restore();
-    }
-    dead(){ return this.alpha <= 0 || this.y > cc.height + 60; }
+  function drawStars(t){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    stars.forEach(s=>{
+      const twinkle=Math.sin(t*s.f1+s.p1)*s.a1+Math.sin(t*s.f2+s.p2)*s.a2;
+      const alpha=Math.max(0.05,Math.min(1,s.baseAlpha+twinkle));
+      const radius=s.r+Math.sin(t*s.rFreq+s.rPhase)*s.rPulse;
+      const[r,g,b]=s.color;
+      if(s.glow&&radius>1){const grd=ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,radius*3.5);grd.addColorStop(0,`rgba(${r},${g},${b},${alpha*0.6})`);grd.addColorStop(1,`rgba(${r},${g},${b},0)`);ctx.beginPath();ctx.arc(s.x,s.y,radius*3.5,0,Math.PI*2);ctx.fillStyle=grd;ctx.fill();}
+      ctx.beginPath();ctx.arc(s.x,s.y,Math.max(0.1,radius),0,Math.PI*2);ctx.fillStyle=`rgba(${r},${g},${b},${alpha})`;ctx.fill();
+    });
   }
+  const ss=document.createElement('style');
+  ss.textContent='@keyframes shoot{0%{transform:translate(0,0) rotate(-35deg);opacity:1;}100%{transform:translate(220px,120px) rotate(-35deg);opacity:0;}}';
+  document.head.appendChild(ss);
+  function shootingStar(){const el=document.createElement('div');el.style.cssText=`position:fixed;width:2px;height:2px;background:white;border-radius:50%;pointer-events:none;z-index:1;top:${Math.random()*60}%;left:${Math.random()*80}%;animation:shoot 1.2s ease-out forwards;`;el.innerHTML='<div style="position:absolute;top:50%;left:50%;width:80px;height:1px;background:linear-gradient(to left,white,transparent);transform:translateY(-50%);"></div>';document.body.appendChild(el);setTimeout(()=>el.remove(),1400);}
+  setInterval(()=>{if(Math.random()<0.5)shootingStar();},3500);
+  resizeStar();initStars();
+  function starLoop(t){drawStars(t/1000);requestAnimationFrame(starLoop);}
+  requestAnimationFrame(starLoop);
+  window.addEventListener('resize',()=>{resizeStar();initStars();});
 
-  let pieces = [], running = true, startTime = null;
-  const RAIN_DURATION = 5500;
+  const observer=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.15});
+  document.querySelectorAll('.timeline-item,.letter-card,.gallery-card').forEach(el=>observer.observe(el));
 
-  function burst(x, y, count){
-    for(let i=0;i<count;i++) pieces.push(new Piece({x,y}));
-  }
-
-  function loop(ts){
-    if(!startTime) startTime = ts;
-    const elapsed = ts - startTime;
-
-    if(elapsed < RAIN_DURATION && pieces.length < 260){
-      pieces.push(new Piece(null));
-      if(elapsed < 300) pieces.push(new Piece(null)); // extra density at start
+  (function(){
+    const cc=document.getElementById('confetti-canvas');
+    const cx=cc.getContext('2d');
+    cc.width=innerWidth;cc.height=innerHeight;
+    window.addEventListener('resize',()=>{cc.width=innerWidth;cc.height=innerHeight;});
+    const COLORS=['#c8a96e','#f0eeff','#d4789a','#6b5b9e','#e8c99a','#f7d6e6','#a898d8','#ffecd2','#ffffff','#ffe0b2'];
+    const SHAPES=['rect','circle','star','heart','diamond'];
+    function rnd(a,b){return a+Math.random()*(b-a);}
+    class Piece{
+      constructor(burst){const bx=burst?burst.x:rnd(0.1,0.9)*cc.width,by=burst?burst.y:-20;this.x=bx+rnd(-100,100);this.y=by;this.vx=burst?rnd(-8,8):rnd(-3,3);this.vy=burst?rnd(-16,-5):rnd(1.5,5);this.gravity=0.2;this.size=rnd(5,13);this.color=COLORS[Math.floor(Math.random()*COLORS.length)];this.shape=SHAPES[Math.floor(Math.random()*SHAPES.length)];this.rotation=rnd(0,Math.PI*2);this.spin=rnd(-0.18,0.18);this.alpha=1;this.decay=rnd(0.007,0.013);this.wobble=rnd(0,Math.PI*2);this.wobbleSpeed=rnd(0.04,0.1);this.scaleX=1;this.scaleDir=rnd(-0.03,0.03);}
+      update(){this.wobble+=this.wobbleSpeed;this.vx+=Math.sin(this.wobble)*0.08;this.vy+=this.gravity;this.x+=this.vx;this.y+=this.vy;this.rotation+=this.spin;this.alpha-=this.decay;this.scaleX+=this.scaleDir;if(this.scaleX>1||this.scaleX<0.1)this.scaleDir*=-1;}
+      draw(){cx.save();cx.globalAlpha=Math.max(0,this.alpha);cx.translate(this.x,this.y);cx.rotate(this.rotation);cx.scale(this.scaleX,1);cx.fillStyle=this.color;const s=this.size;if(this.shape==='rect'){cx.fillRect(-s/2,-s*0.3,s,s*0.6);}else if(this.shape==='circle'){cx.beginPath();cx.arc(0,0,s/2,0,Math.PI*2);cx.fill();}else if(this.shape==='diamond'){cx.beginPath();cx.moveTo(0,-s/2);cx.lineTo(s/2,0);cx.lineTo(0,s/2);cx.lineTo(-s/2,0);cx.closePath();cx.fill();}else if(this.shape==='star'){let rot=-Math.PI/2,step=Math.PI/5;cx.beginPath();cx.moveTo(0,-s/2);for(let i=0;i<5;i++){cx.lineTo(Math.cos(rot)*s/2,Math.sin(rot)*s/2);rot+=step;cx.lineTo(Math.cos(rot)*s/4,Math.sin(rot)*s/4);rot+=step;}cx.closePath();cx.fill();}else{cx.beginPath();cx.moveTo(0,s*0.25);cx.bezierCurveTo(s*0.25,-s*0.25,s*0.8,s*0.1,0,s*0.8);cx.bezierCurveTo(-s*0.8,s*0.1,-s*0.25,-s*0.25,0,s*0.25);cx.closePath();cx.fill();}cx.restore();}
+      dead(){return this.alpha<=0||this.y>cc.height+60;}
     }
+    let pieces=[],running=true,startTime=null;
+    const RAIN=5500;
+    function burst(x,y,n){for(let i=0;i<n;i++)pieces.push(new Piece({x,y}));}
+    function loop(ts){if(!startTime)startTime=ts;const el=ts-startTime;if(el<RAIN&&pieces.length<260){pieces.push(new Piece(null));if(el<300)pieces.push(new Piece(null));}cx.clearRect(0,0,cc.width,cc.height);pieces=pieces.filter(p=>!p.dead());pieces.forEach(p=>{p.update();p.draw();});if(running)requestAnimationFrame(loop);}
+    const toast=document.getElementById('anni-toast');
+    const overlay=document.getElementById('confetti-overlay');
+    setTimeout(()=>{toast.classList.add('show');},150);
+    setTimeout(()=>{burst(cc.width*.25,cc.height*.45,70);burst(cc.width*.75,cc.height*.45,70);burst(cc.width*.5,cc.height*.3,60);},300);
+    setTimeout(()=>{burst(cc.width*.15,cc.height*.6,40);burst(cc.width*.85,cc.height*.6,40);},900);
+    requestAnimationFrame(loop);
+    setTimeout(()=>{toast.classList.add('hide');},4000);
+    setTimeout(()=>{overlay.classList.add('fade-out');document.getElementById('hero').classList.add('revealed');},5200);
+    setTimeout(()=>{running=false;cx.clearRect(0,0,cc.width,cc.height);if(toast.parentNode)toast.remove();if(cc.parentNode)cc.remove();if(overlay.parentNode)overlay.remove();},7000);
+  })();
+}
 
-    cx.clearRect(0, 0, cc.width, cc.height);
-    pieces = pieces.filter(p => !p.dead());
-    pieces.forEach(p => { p.update(); p.draw(); });
-
-    if(running) requestAnimationFrame(loop);
-  }
-
-  const toast = document.getElementById('anni-toast');
-  const overlay = document.getElementById('confetti-overlay');
-
-  // Show toast
-  setTimeout(() => { toast.classList.add('show'); }, 150);
-
-  // Burst explosions
-  setTimeout(() => {
-    burst(cc.width * 0.25, cc.height * 0.45, 70);
-    burst(cc.width * 0.75, cc.height * 0.45, 70);
-    burst(cc.width * 0.5,  cc.height * 0.3,  60);
-  }, 300);
-
-  // Second wave bursts
-  setTimeout(() => {
-    burst(cc.width * 0.15, cc.height * 0.6, 40);
-    burst(cc.width * 0.85, cc.height * 0.6, 40);
-  }, 900);
-
-  // Start rain loop
-  requestAnimationFrame(loop);
-
-  // Fade out toast
-  setTimeout(() => { toast.classList.add('hide'); }, 4000);
-
-  // Fade out overlay + reveal hero text
-  setTimeout(() => {
-    overlay.classList.add('fade-out');
-    document.getElementById('hero').classList.add('revealed');
-  }, 5200);
-
-  // Cleanup everything
-  setTimeout(() => {
-    running = false;
-    cx.clearRect(0, 0, cc.width, cc.height);
-    toast.remove();
-    cc.remove();
-    overlay.remove();
-  }, 7000);
-})();
+/* ════════════════════════════════════════
+   LETTER MODAL
+════════════════════════════════════════ */
+function openLetterModal(){document.getElementById('letterModal').classList.add('open');}
+function closeLetterModal(){document.getElementById('letterModal').classList.remove('open');['lFrom','lBody','lSign'].forEach(id=>document.getElementById(id).value='');}
+function saveLetter(){const from=document.getElementById('lFrom').value.trim(),body=document.getElementById('lBody').value.trim(),sign=document.getElementById('lSign').value.trim();if(!body)return;const card=document.createElement('div');card.className='letter-card visible';card.innerHTML=`${from?`<p class="letter-from">${from} ✦</p>`:''}<p class="letter-body">${body.replace(/\n/g,'<br>')}</p>${sign?`<span class="letter-sign">— ${sign}</span>`:''}`;document.getElementById('extra-letters').appendChild(card);closeLetterModal();}
+document.getElementById('letterModal').addEventListener('click',function(e){if(e.target===this)closeLetterModal();});
 </script>
 </body>
 </html>
