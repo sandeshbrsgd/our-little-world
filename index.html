@@ -37,7 +37,6 @@
     display:flex;flex-direction:column;align-items:center;
   }
 
-  /* Route heading — Mumbai · Pune · Mumbai */
   .pw-route{
     display:flex;align-items:center;justify-content:center;
     gap:0;margin-bottom:2.2rem;
@@ -72,13 +71,11 @@
     background:var(--gold);box-shadow:0 0 8px rgba(200,169,110,0.8);
   }
 
-  /* Lock icon */
   .pw-lock{
     font-size:1.3rem;margin-bottom:1.5rem;display:block;
     opacity:0.55;animation:fadeUp 1s 0.45s both;
   }
 
-  /* Hint line */
   .pw-hint-line{
     font-family:'Cormorant Garamond',serif;font-style:italic;
     font-size:clamp(0.75rem,2vw,1rem);
@@ -87,7 +84,6 @@
     padding:0 1.5rem;
   }
 
-  /* Dots */
   .pw-dots{display:flex;gap:18px;justify-content:center;margin-bottom:1.2rem;animation:fadeUp 1s 0.6s both;}
   .pw-dot{
     width:13px;height:13px;border-radius:50%;
@@ -180,6 +176,35 @@
   .gallery-card img{width:100%;height:100%;object-fit:cover;transition:transform 0.6s;display:block;}
   .gallery-card:hover img{transform:scale(1.05);}
 
+  /* ═══ VIDEOS SECTION ═══ */
+  #videos{padding:4rem 0 6rem;}
+  .videos-grid{max-width:960px;margin:0 auto;padding:0 2rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.8rem;}
+  .video-card{
+    background:linear-gradient(135deg,rgba(107,91,158,0.1),rgba(200,169,110,0.05));
+    border:1px solid rgba(200,169,110,0.18);
+    border-radius:6px;overflow:hidden;
+    opacity:0;transform:translateY(20px);
+    transition:opacity 0.6s,transform 0.6s,box-shadow 0.4s;
+  }
+  .video-card.visible{opacity:1;transform:translateY(0);}
+  .video-card:hover{box-shadow:0 0 40px rgba(200,169,110,0.18);}
+  .video-embed{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;}
+  .video-embed iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none;}
+  .video-caption{padding:1rem 1.2rem 1.2rem;}
+  .video-dedicate-label{font-family:'Cinzel',serif;font-size:0.58rem;letter-spacing:0.3em;color:var(--gold);text-transform:uppercase;display:block;margin-bottom:0.4rem;}
+  .video-song-title{font-size:1.05rem;font-weight:600;color:var(--star-white);margin:0 0 0.3rem;}
+  .video-message{font-style:italic;font-size:0.92rem;color:rgba(240,238,255,0.55);line-height:1.6;margin:0;}
+  .video-sign{font-family:'Sacramento',cursive;font-size:1.3rem;color:var(--rose);display:block;margin-top:0.5rem;opacity:0.85;}
+  .add-video-btn{
+    display:flex;align-items:center;justify-content:center;
+    gap:0.6rem;margin:2.5rem auto 0;width:fit-content;
+    font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:0.22em;text-transform:uppercase;
+    padding:0.75rem 1.6rem;border-radius:2px;cursor:pointer;
+    background:rgba(200,169,110,0.1);border:1px solid var(--gold);color:var(--gold);
+    transition:background 0.3s;
+  }
+  .add-video-btn:hover{background:rgba(200,169,110,0.22);}
+
   #letters{padding:4rem 0 6rem;}
   .letters-wrap{max-width:760px;margin:0 auto;padding:0 2rem;display:flex;flex-direction:column;gap:3rem;}
   .letter-card{background:linear-gradient(135deg,rgba(107,91,158,0.08),rgba(200,169,110,0.05));border:1px solid rgba(200,169,110,0.14);border-radius:2px;padding:2.5rem 2.5rem 2rem;position:relative;opacity:0;transform:translateY(20px);transition:opacity 0.7s,transform 0.7s;}
@@ -258,8 +283,6 @@
   <canvas id="pw-train-canvas"></canvas>
 
   <div class="pw-content">
-
-    <!-- Mumbai · Pune · Mumbai -->
     <div class="pw-route">
       <div class="pw-city-name">Mumbai</div>
       <div class="pw-connector">
@@ -277,7 +300,6 @@
     </div>
 
     <p class="pw-hint-line">the journey of a lifetime, locked in eight digits</p>
-
     <span class="pw-lock" id="pw-lock-icon">🔒</span>
 
     <div class="pw-dots" id="pw-dots">
@@ -292,7 +314,6 @@
     </div>
 
     <input id="pw-input" type="tel" maxlength="8" inputmode="numeric" autocomplete="off" autofocus>
-
     <p class="pw-tap" id="pw-tap" onclick="focusPwInput()">tap here &amp; type your 8-digit secret</p>
     <p class="pw-error-msg" id="pw-error">not quite, love…</p>
 
@@ -300,7 +321,6 @@
       <p class="pw-unlocked-main">You're in <span style="color:#d4789a;">❤</span></p>
       <p class="pw-unlocked-sub">Welcome home, my golu molu</p>
     </div>
-
   </div>
 </div>
 
@@ -316,12 +336,15 @@
     <span class="toast-line3">Anniversary</span>
     <span class="toast-hearts">❤ &nbsp; ❤ &nbsp; ❤</span>
   </div>
+
   <nav class="header-div">
     <a class="header-title" href="#hero">Home</a>
     <a class="header-title" href="#story">Our Story</a>
     <a class="header-title" href="#gallery">Gallery</a>
+    <a class="header-title" href="#videos">Songs</a>
     <a class="header-title" href="#letters">Letter</a>
   </nav>
+
   <section id="hero">
     <p class="hero-eyebrow">One Year Around the Sun Together</p>
     <h1 class="hero-title">Written in the Stars</h1>
@@ -329,7 +352,9 @@
     <p class="hero-date">— April 2025 → April 2026 —</p>
     <div class="scroll-hint"><span>Scroll</span><div class="line"></div></div>
   </section>
+
   <div class="divider"><span class="divider-symbol">✦</span></div>
+
   <section id="story">
     <div class="section-header">
       <span class="section-label">Chapter by Chapter</span>
@@ -358,7 +383,9 @@
       </div>
     </div>
   </section>
+
   <div class="divider"><span class="divider-symbol">✦</span></div>
+
   <section id="gallery">
     <div class="section-header"><span class="section-label">Moments Captured</span><h2 class="section-title">Our Gallery</h2></div>
     <div class="gallery-grid">
@@ -370,20 +397,93 @@
       <div class="gallery-card"><img src="/assets/img-6.png" alt="Our sixth photo"></div>
       <div class="gallery-card"><img src="/assets/img-7.png" alt="Our seventh photo"></div>
       <div class="gallery-card"><img src="/assets/img-8.png" alt="Our eighth photo"></div>
+      <div class="gallery-card"><img src="/assets/img-9.jpg" alt="Our ninth photo"></div>
     </div>
   </section>
+
   <div class="divider"><span class="divider-symbol">✦</span></div>
+
+  <!-- ═══ SONGS / YOUTUBE DEDICATIONS ═══ -->
+  <section id="videos">
+    <div class="section-header">
+      <span class="section-label">Songs</span>
+      <h2 class="section-title"> Dedicated to You</h2>
+    </div>
+
+    <div class="videos-grid" id="videos-grid">
+
+      <!-- Pre-loaded Song 1 — change the YouTube video ID in the embed URL to any song you want -->
+      <div class="video-card">
+       <div class="video-embed">
+  <a href="https://youtu.be/hHuG7FIKgtc?si=Lzt15L-4UuVZ_AXH"
+     target="_blank"
+     rel="noopener noreferrer">
+    <img src="https://img.youtube.com/vi/hHuG7FIKgtc/maxresdefault.jpg"
+         alt="ISHQ"
+         style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;">
+  </a>
+</div>
+        <div class="video-caption">
+          <span class="video-dedicate-label">♪ Dedicated to you ✦</span>
+          <p class="video-song-title">ISHQ</p>
+          <p class="video-message">This one plays on loop in my heart.</p>
+          <span class="video-sign">— Always yours</span>
+        </div>
+      </div>
+
+      <!-- Pre-loaded Song 2 -->
+      <div class="video-card">
+        <div class="video-embed">
+  <a href="https://youtu.be/-2RAq5o5pwc?si=JSK2rkF4etv4QuJS"
+     target="_blank"
+     rel="noopener noreferrer">
+    <img src="https://img.youtube.com/vi/-2RAq5o5pwc/maxresdefault.jpg"
+         alt="JHOL"
+         style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;">
+  </a>
+</div>
+        <div class="video-caption">
+          <span class="video-dedicate-label">♪ Dedicated to you ✦</span>
+          <p class="video-song-title">JHOL</p>
+          <p class="video-message">No matter the miles, our souls are always close. This song is us.</p>
+          <span class="video-sign">— Only yours</span>
+        </div>
+      </div>
+
+      <!-- Pre-loaded Song 3 -->
+      <div class="video-card">
+        <div class="video-embed">
+  <a href="https://youtu.be/LUgpPmj6nR8?si=jztkLG3ANHImVe-C"
+     target="_blank"
+     rel="noopener noreferrer">
+    <img src="https://img.youtube.com/vi/LUgpPmj6nR8/maxresdefault.jpg"
+         alt="KHAT"
+         style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;">
+  </a>
+</div>
+        <div class="video-caption">
+          <span class="video-dedicate-label">♪ Dedicated to you ✦</span>
+          <p class="video-song-title">KHAT</p>
+          <p class="video-message">Every line of this song reminds me of you.</p>
+          <span class="video-sign">— Forever yours</span>
+        </div>
+      </div>
+
+    </div>
+
+
   <section id="letters">
     <div class="section-header"><span class="section-label">Words from the Heart</span><h2 class="section-title">Letter For you</h2></div>
     <div class="letters-wrap">
       <div class="letter-card">
         <p class="letter-from">From my heart to yours ✦</p>
-        <p class="letter-body">Every morning I wake up and the first thought that drifts into my mind is you. Not the idea of you, but the sound of your laugh, the way your eyes crinkle when something genuinely catches you off guard. The miles between us are real, but they have never once made me feel like you are far. You are the closest thing I know.<br><br>Jadu Hai Teri Har Ek Baat Me.<br>Yaad Bahut Aate Ho Din Aur Raat Me.<br>Kal Jab Dekha Tha Mene Sapna Raat Me.<br>Tab Bhi Apka Hi Hath Tha Mere Hath Me...!!!</p>
+        <p class="letter-body">Every morning I wake up and the first thought that drifts into my mind is you. Not the idea of you, but the sound of your laugh, the way your eyes crinkle when something genuinely catches you off guard. The miles between us are real, but they have never once made me feel like you are far. You are the closest thing I know.<br><br>Logo Ko Tere bare mein boli har ek chij kahani lagti hai.<br>Usme mai Krishna aur tu meri Radha Rani lagti hai.<br>Kash ye kahani Puri hoti,tu adhuri nahi Puri Meri hoti.<br>Agar wo khani Puri hoti to Usme mein Shiv aur tu meri Parvati hoti🌸💗</p>
         <span class="letter-sign">Always yours</span>
       </div>
       <div id="extra-letters"></div>
     </div>
   </section>
+
   <footer>
     <p class="big-msg">Here's to forever,<br>one midnight call at a time.</p>
     <div class="hearts">❤ &nbsp; ❤ &nbsp; ❤</div>
@@ -391,6 +491,25 @@
   </footer>
 </div>
 
+<!-- VIDEO MODAL -->
+<div class="modal-overlay" id="videoModal">
+  <div class="modal">
+    <button class="close-modal" onclick="closeVideoModal()">✕</button>
+    <h3>Dedicate a Song ♪</h3>
+    <em style="font-size:0.8rem;color:rgba(240,238,255,0.3);display:block;margin-bottom:1rem;font-family:'Cormorant Garamond',serif;">Paste the YouTube link and write a little note for her</em>
+    <input type="text" id="vUrl" placeholder="YouTube link (e.g. https://youtube.com/watch?v=...)">
+    <input type="text" id="vTitle" placeholder="Song name (e.g. Tum Hi Ho)">
+    <textarea id="vMsg" placeholder="Your message with this song…" style="min-height:90px;"></textarea>
+    <input type="text" id="vSign" placeholder="Sign off (e.g. Always yours)">
+    <div class="modal-btns">
+      <button class="btn btn-ghost" onclick="closeVideoModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="addVideoCard()">Add Dedication ✦</button>
+    </div>
+    <p id="v-error" style="color:var(--rose);font-style:italic;font-size:0.85rem;margin-top:0.5rem;display:none;font-family:'Cormorant Garamond',serif;">Please enter a valid YouTube link.</p>
+  </div>
+</div>
+
+<!-- LETTER MODAL -->
 <div class="modal-overlay" id="letterModal">
   <div class="modal">
     <button class="close-modal" onclick="closeLetterModal()">✕</button>
@@ -441,7 +560,7 @@ pwInput.addEventListener('input', ()=>{
   if(pwEntered.length === 8){
     pwLocked = true;
     if(pwEntered === CORRECT_PIN){
-      pwInput.blur();  // ← ADD THIS LINE to dismiss keyboard
+      pwInput.blur();
       updateDots('success');
       pwLockIcon.textContent = '🔓';
       stopTrainLoop();
@@ -490,39 +609,27 @@ function initPwStars(){
 }
 initPwStars();
 function drawMoon(ctx, W, H){
-  // Moon sits in top-right corner, below the route heading
   const mx = W * 0.88, my = H * 0.38, mr = Math.min(W*0.07, H*0.1, 48);
-  // outer glow
   const glow = ctx.createRadialGradient(mx,my,mr*0.6, mx,my,mr*2.8);
   glow.addColorStop(0,'rgba(240,230,180,0.13)');
   glow.addColorStop(0.4,'rgba(220,200,140,0.06)');
   glow.addColorStop(1,'rgba(200,180,110,0)');
   ctx.fillStyle=glow;
   ctx.beginPath(); ctx.arc(mx,my,mr*2.8,0,Math.PI*2); ctx.fill();
-
-  // moon disc
   const disc = ctx.createRadialGradient(mx-mr*0.25,my-mr*0.2,mr*0.1, mx,my,mr);
   disc.addColorStop(0,'rgba(255,252,220,0.98)');
   disc.addColorStop(0.55,'rgba(245,235,185,0.97)');
   disc.addColorStop(1,'rgba(220,200,140,0.9)');
   ctx.fillStyle=disc;
   ctx.beginPath(); ctx.arc(mx,my,mr,0,Math.PI*2); ctx.fill();
-
-  // subtle craters
-  const craters=[
-    {ox:-0.28,oy:0.18,r:0.13},{ox:0.2,oy:-0.3,r:0.09},
-    {ox:0.1,oy:0.35,r:0.07},{ox:-0.1,oy:-0.15,r:0.05}
-  ];
+  const craters=[{ox:-0.28,oy:0.18,r:0.13},{ox:0.2,oy:-0.3,r:0.09},{ox:0.1,oy:0.35,r:0.07},{ox:-0.1,oy:-0.15,r:0.05}];
   craters.forEach(c=>{
     ctx.beginPath(); ctx.arc(mx+c.ox*mr, my+c.oy*mr, c.r*mr, 0, Math.PI*2);
     ctx.fillStyle='rgba(190,175,120,0.18)'; ctx.fill();
   });
-
-  // rim shimmer
   ctx.beginPath(); ctx.arc(mx,my,mr,0,Math.PI*2);
   ctx.strokeStyle='rgba(255,250,210,0.25)'; ctx.lineWidth=1.5; ctx.stroke();
 }
-
 function pwStarLoop(t){
   pwSX.clearRect(0,0,pwSC.width,pwSC.height);
   drawMoon(pwSX, pwSC.width, pwSC.height);
@@ -538,30 +645,13 @@ window.addEventListener('resize',()=>{ resizePwStars(); initPwStars(); });
 
 /* ════════════════════════════════════════
    TRAIN ANIMATION
-   ─────────────────────────────────────
-   Train moves LEFT → RIGHT (trainX increases).
-   trainX = the NOSE (right-most leading tip) of the engine.
-   Engine body extends LEFTWARD from trainX.
-   Coaches trail further LEFT behind the engine.
-
-   Physical layout (offsets from trainX, all NEGATIVE = leftward):
-     nose/cowcatcher : trainX          (rightmost point, front)
-     boiler          : trainX-14  to  trainX-74
-     chimney         : trainX-60  (near front of boiler)
-     cab             : trainX-74  to  trainX-108  (rear of loco)
-     coach 1         : trainX-114 to  trainX-200
-     coach 2         : trainX-206 to  trainX-292
-     coach 3         : trainX-298 to  trainX-384
-   Total width ≈ 390px  → start trainX at -20 (nose just off-screen left)
 ════════════════════════════════════════ */
 const tc   = document.getElementById('pw-train-canvas');
 const tctx = tc.getContext('2d');
 let trainLoopRunning = true;
-
-// Train width = 108 (loco) + 6 (gap) + 3×(86+6) = 390
 const TOTAL_W   = 390;
 const TRAIN_SPEED = 1.4;
-let trainX = -20;   // nose starts just off left edge
+let trainX = -20;
 let smoke  = [];
 let fc     = 0;
 
@@ -573,7 +663,6 @@ resizeTC();
 window.addEventListener('resize', resizeTC);
 function stopTrainLoop(){ trainLoopRunning=false; }
 
-/* ── station ── */
 function drawStation(ctx, cx, label, H){
   const mobile = tc.width < 480;
   const scale  = mobile ? 0.72 : 1;
@@ -607,7 +696,6 @@ function drawStation(ctx, cx, label, H){
   ctx.fillText(label,cx,by-48*scale);
 }
 
-/* ── wheel helper ── */
 function drawWheel(ctx, wx, wy, r){
   ctx.beginPath(); ctx.arc(wx,wy,r,0,Math.PI*2);
   ctx.fillStyle='#16143a'; ctx.strokeStyle='#c8a96e'; ctx.lineWidth=r>8?1.2:0.9;
@@ -624,38 +712,20 @@ function drawWheel(ctx, wx, wy, r){
   ctx.fillStyle='#c8a96e'; ctx.fill();
 }
 
-/* ══════════════════════════════════════════
-   drawTrain(ctx, nose, H)
-   nose = x-coordinate of the FRONT TIP of the engine.
-   Engine occupies [nose-108 … nose].
-   Coaches trail to the LEFT: [nose-114 … nose-384].
-   Everything is drawn relative to `nose`.
-══════════════════════════════════════════ */
 function drawTrain(ctx, nose, H){
   const groundY = H-28;
-  const rail    = groundY-4;  // y where wheels sit
-  const boilerY = rail-36;    // top of boiler body
-
-  /* ── 3 COACHES — trailing to the LEFT of the engine ─────────────
-     Coach 0 (closest to engine) : nose-114  to  nose-114-86 = nose-200
-     Coach 1                     : nose-206  to  nose-292
-     Coach 2 (rear of train)     : nose-298  to  nose-384              */
+  const rail    = groundY-4;
+  const boilerY = rail-36;
   const CW=86, CGAP=6, LOCO_W=108;
   const coachPalette=['#161432','#1a1838','#181634'];
-
   for(let c=0;c<3;c++){
-    // right edge of this coach (closest edge toward the engine)
     const cRight = nose - LOCO_W - CGAP - c*(CW+CGAP);
     const cLeft  = cRight - CW;
     const cy     = rail-32;
-
-    // body
     ctx.fillStyle=coachPalette[c]; ctx.strokeStyle='#c8a96e'; ctx.lineWidth=0.9;
     ctx.beginPath(); ctx.roundRect(cLeft,cy,CW,28,[4,4,0,0]); ctx.fill(); ctx.stroke();
-    // roof
     ctx.fillStyle='#22204e'; ctx.strokeStyle='#7a6340'; ctx.lineWidth=0.5;
     ctx.beginPath(); ctx.roundRect(cLeft+2,cy,CW-4,5,[3,3,0,0]); ctx.fill(); ctx.stroke();
-    // 4 windows
     const winW=12, winH=10, winY=cy+7, ws=(CW-16)/5;
     for(let w=0;w<4;w++){
       const wxx=cLeft+8+w*ws;
@@ -664,79 +734,50 @@ function drawTrain(ctx, nose, H){
       ctx.strokeStyle='rgba(200,169,110,0.25)'; ctx.lineWidth=0.4;
       ctx.beginPath(); ctx.moveTo(wxx+winW/2,winY); ctx.lineTo(wxx+winW/2,winY+winH); ctx.stroke();
     }
-    // coach badge
     ctx.fillStyle='rgba(200,169,110,0.14)'; ctx.strokeStyle='#c8a96e'; ctx.lineWidth=0.4;
     ctx.beginPath(); ctx.roundRect(cLeft+5,cy+19,20,7,1); ctx.fill(); ctx.stroke();
     ctx.fillStyle='#c8a96e'; ctx.font='500 5.5px "Cinzel",serif';
     ctx.textAlign='center'; ctx.textBaseline='middle';
     ctx.fillText('S'+(c+1),cLeft+15,cy+22.5);
-    // bogies
     [cLeft+13, cLeft+CW-13].forEach(bx2=>{
       drawWheel(ctx,bx2,rail,7);
       ctx.fillStyle='#1c1a40'; ctx.strokeStyle='#7a6340'; ctx.lineWidth=0.5;
       ctx.beginPath(); ctx.roundRect(bx2-9,rail-9,18,6,1); ctx.fill(); ctx.stroke();
     });
-    // coupling to right neighbour (engine or previous coach)
-    const coupR = (c===0) ? nose-LOCO_W : nose-LOCO_W-CGAP-c*(CW+CGAP)+CGAP;
     ctx.strokeStyle='rgba(200,169,110,0.4)'; ctx.lineWidth=1.5;
     ctx.beginPath(); ctx.moveTo(cRight,rail-10); ctx.lineTo(cRight+CGAP,rail-10); ctx.stroke();
   }
-
-  /* ── LOCOMOTIVE — occupies [nose-108 … nose] ─────────────────────
-     nose        = right tip = cowcatcher/headlight (FRONT, facing RIGHT)
-     nose-14     = front buffer plate inner edge
-     nose-14..nose-74 = boiler body (60px wide)
-     chimney at  nose-20 (near front of boiler)
-     cab at      nose-74..nose-108 (REAR, leftmost)                   */
-
-  // CAB (rear = left side of loco)
   const cabRight = nose-74, cabLeft = nose-108;
   const cabY     = boilerY-8;
   ctx.fillStyle='#181630'; ctx.strokeStyle='#c8a96e'; ctx.lineWidth=1;
   ctx.beginPath(); ctx.roundRect(cabLeft,cabY,34,36,[5,5,0,0]); ctx.fill(); ctx.stroke();
-  // cab roof
   ctx.fillStyle='#26224a'; ctx.strokeStyle='#7a6340'; ctx.lineWidth=0.7;
   ctx.beginPath(); ctx.roundRect(cabLeft-3,cabY-7,40,9,[3,3,0,0]); ctx.fill(); ctx.stroke();
-  // cab windows
   ctx.fillStyle='rgba(200,169,110,0.1)'; ctx.strokeStyle='#c8a96e'; ctx.lineWidth=0.7;
   ctx.beginPath(); ctx.roundRect(cabLeft+4,cabY+5,14,12,2); ctx.fill(); ctx.stroke();
   ctx.beginPath(); ctx.roundRect(cabLeft+21,cabY+5,9,12,2); ctx.fill(); ctx.stroke();
-
-  // BOILER BODY (nose-74 to nose-14)
   ctx.fillStyle='#1c1a3c'; ctx.strokeStyle='#c8a96e'; ctx.lineWidth=1;
   ctx.beginPath(); ctx.roundRect(nose-74,boilerY,62,26,[2,8,2,2]); ctx.fill(); ctx.stroke();
-  // boiler bands
   for(let b=1;b<=3;b++){
     ctx.strokeStyle='rgba(200,169,110,0.2)'; ctx.lineWidth=0.8;
     ctx.beginPath(); ctx.moveTo(nose-74+b*14,boilerY); ctx.lineTo(nose-74+b*14,boilerY+26); ctx.stroke();
   }
-  // steam dome (middle-rear of boiler)
   ctx.fillStyle='#28244e'; ctx.strokeStyle='#c8a96e'; ctx.lineWidth=0.8;
   ctx.beginPath(); ctx.ellipse(nose-52,boilerY+1,9,7,0,Math.PI,0); ctx.fill(); ctx.stroke();
-  // sandbox dome (toward front)
   ctx.beginPath(); ctx.ellipse(nose-36,boilerY+1,6,5,0,Math.PI,0); ctx.fill(); ctx.stroke();
-
-  // CHIMNEY — at nose-22 (front quarter of boiler, near the front)
   const chX=nose-28, chY=boilerY-18;
   ctx.fillStyle='#0e0c24'; ctx.strokeStyle='#c8a96e'; ctx.lineWidth=0.9;
   ctx.beginPath(); ctx.roundRect(chX,chY,13,18,2); ctx.fill(); ctx.stroke();
-  // flared cap
   ctx.beginPath(); ctx.roundRect(chX-4,chY-3,21,6,3); ctx.fill(); ctx.stroke();
-
-  // FRONT BUFFER PLATE (at nose-14..nose-9, right face of boiler)
   ctx.fillStyle='#0e0c24'; ctx.strokeStyle='#c8a96e'; ctx.lineWidth=1;
   ctx.beginPath(); ctx.roundRect(nose-9,boilerY+4,6,18,1); ctx.fill(); ctx.stroke();
-
-  // COWCATCHER — slopes from nose-9 rightward/downward to nose+2
-  // Points to the RIGHT (direction of travel = forward)
   ctx.fillStyle='#181630'; ctx.strokeStyle='#c8a96e'; ctx.lineWidth=0.8;
   ctx.beginPath();
-  ctx.moveTo(nose-9, boilerY+6);   // top-left of cowcatcher
-  ctx.lineTo(nose+2, boilerY+20);  // bottom-right tip (furthest right = front)
-  ctx.lineTo(nose+2, boilerY+26);  // bottom-right base
-  ctx.lineTo(nose-9, boilerY+26);  // bottom-left
+  ctx.moveTo(nose-9, boilerY+6);
+  ctx.lineTo(nose+2, boilerY+20);
+  ctx.lineTo(nose+2, boilerY+26);
+  ctx.lineTo(nose-9, boilerY+26);
   ctx.closePath(); ctx.fill(); ctx.stroke();
-  // cowcatcher slats
   ctx.strokeStyle='rgba(200,169,110,0.32)'; ctx.lineWidth=0.5;
   for(let s=1;s<=3;s++){
     const t=s/4;
@@ -745,12 +786,9 @@ function drawTrain(ctx, nose, H){
     ctx.lineTo(nose-9+11*t,  boilerY+26);
     ctx.stroke();
   }
-
-  // HEADLIGHT — on the right face (nose), the FRONT
   ctx.beginPath(); ctx.arc(nose-3,boilerY+13,5.5,0,Math.PI*2);
   ctx.fillStyle='rgba(255,245,170,0.6)'; ctx.fill();
   ctx.strokeStyle='#c8a96e'; ctx.lineWidth=0.7; ctx.stroke();
-  // light beam spraying RIGHTWARD (forward)
   const lg=ctx.createRadialGradient(nose-3,boilerY+13,0,nose-3,boilerY+13,50);
   lg.addColorStop(0,'rgba(255,245,160,0.22)');
   lg.addColorStop(1,'rgba(255,245,160,0)');
@@ -760,35 +798,26 @@ function drawTrain(ctx, nose, H){
   ctx.lineTo(nose+50,boilerY+3);
   ctx.lineTo(nose+50,boilerY+23);
   ctx.closePath(); ctx.fill();
-
-  // WHEELS
-  // small pilot wheel right at nose
   drawWheel(ctx, nose-10, rail, 7);
-  // two big drive wheels under boiler
   drawWheel(ctx, nose-36, rail, 12);
   drawWheel(ctx, nose-62, rail, 12);
-  // connecting side rod between the two drive wheels
   ctx.strokeStyle='#c8a96e'; ctx.lineWidth=2.5;
   ctx.beginPath(); ctx.moveTo(nose-36,rail-6); ctx.lineTo(nose-62,rail-6); ctx.stroke();
-  // piston rod from pilot wheel to first drive wheel
   ctx.strokeStyle='rgba(200,169,110,0.5)'; ctx.lineWidth=1.2;
   ctx.beginPath(); ctx.moveTo(nose-10,rail-4); ctx.lineTo(nose-36,rail-4); ctx.stroke();
-  // trailing wheel under cab
   drawWheel(ctx, nose-92, rail, 8);
 }
 
-/* ── smoke: chimney at nose-28+6 = nose-22 horizontally ── */
 function spawnSmoke(){
   const H   = tc.height;
   const rail= H-28-4;
-  // chimney tip x = trainX (nose) - 28 + 6 = trainX - 22
   const tipX = trainX - 22;
-  const tipY = rail - 36 - 18 - 3;   // boilerY - chimneyH - cap
+  const tipY = rail - 36 - 18 - 3;
   for(let i=0;i<2;i++){
     smoke.push({
       x: tipX+(Math.random()-.5)*4,
       y: tipY,
-      vx: Math.random()*0.5+0.3,    // drifts backward (rightward = behind train) + spreads
+      vx: Math.random()*0.5+0.3,
       vy:-(Math.random()*0.9+0.5),
       r:  Math.random()*4+5,
       alpha:0.52,
@@ -803,35 +832,25 @@ function trainLoop(){
   const W=tc.width, H=tc.height;
   tctx.clearRect(0,0,W,H);
   const groundY=H-28;
-
-  // ground glow
   const grd=tctx.createLinearGradient(0,groundY-4,0,H);
   grd.addColorStop(0,'rgba(28,24,58,0.55)'); grd.addColorStop(1,'transparent');
   tctx.fillStyle=grd; tctx.fillRect(0,groundY-4,W,H-groundY+4);
-
-  // sleepers
   tctx.fillStyle='rgba(80,65,35,0.35)';
   for(let sx=0;sx<W;sx+=20){
     tctx.beginPath(); tctx.roundRect(sx,groundY-4,13,8,1); tctx.fill();
   }
-  // rails
   tctx.strokeStyle='rgba(200,169,110,0.55)'; tctx.lineWidth=2.5;
   tctx.beginPath(); tctx.moveTo(0,groundY); tctx.lineTo(W,groundY); tctx.stroke();
   tctx.strokeStyle='rgba(200,169,110,0.4)'; tctx.lineWidth=1.8;
   tctx.beginPath(); tctx.moveTo(0,groundY+7); tctx.lineTo(W,groundY+7); tctx.stroke();
-  // rail bolts
   tctx.fillStyle='rgba(200,169,110,0.3)';
   for(let bx=15;bx<W;bx+=55){
     [groundY,groundY+7].forEach(by=>{ tctx.beginPath(); tctx.arc(bx,by,2,0,Math.PI*2); tctx.fill(); });
   }
-
-  // stations — keep both fully inside the canvas
   const puneX   = Math.round(W*0.12) + 30;
   const mumbaiX = Math.min(Math.round(W*0.85), W - 55);
   drawStation(tctx, puneX,   'PUNE',   H);
   drawStation(tctx, mumbaiX, 'MUMBAI', H);
-
-  // smoke
   if(fc%5===0) spawnSmoke();
   smoke=smoke.filter(p=>p.alpha>0.015);
   smoke.forEach(p=>{
@@ -839,15 +858,9 @@ function trainLoop(){
     tctx.beginPath(); tctx.arc(p.x,p.y,p.r,0,Math.PI*2);
     tctx.fillStyle=`rgba(185,180,210,${p.alpha})`; tctx.fill();
   });
-
-  // draw train — trainX is the NOSE (leading right tip)
   drawTrain(tctx, trainX, H);
-
-  // advance nose to the right
   trainX += TRAIN_SPEED;
-  // reset when the tail (nose - totalWidth) clears the right edge
   if(trainX > W + TOTAL_W + 30) trainX = -30;
-
   fc++;
   requestAnimationFrame(trainLoop);
 }
@@ -892,7 +905,7 @@ function initSiteAnimations(){
   window.addEventListener('resize',()=>{resizeStar();initStars();});
 
   const observer=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.15});
-  document.querySelectorAll('.timeline-item,.letter-card,.gallery-card').forEach(el=>observer.observe(el));
+  document.querySelectorAll('.timeline-item,.letter-card,.gallery-card,.video-card').forEach(el=>observer.observe(el));
 
   (function(){
     const cc=document.getElementById('confetti-canvas');
@@ -922,6 +935,51 @@ function initSiteAnimations(){
     setTimeout(()=>{overlay.classList.add('fade-out');document.getElementById('hero').classList.add('revealed');},5200);
     setTimeout(()=>{running=false;cx.clearRect(0,0,cc.width,cc.height);if(toast.parentNode)toast.remove();if(cc.parentNode)cc.remove();if(overlay.parentNode)overlay.remove();},7000);
   })();
+}
+
+/* ════════════════════════════════════════
+   VIDEO MODAL
+════════════════════════════════════════ */
+function openVideoModal(){ document.getElementById('videoModal').classList.add('open'); }
+function closeVideoModal(){
+  document.getElementById('videoModal').classList.remove('open');
+  ['vUrl','vTitle','vMsg','vSign'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('v-error').style.display='none';
+}
+document.getElementById('videoModal').addEventListener('click',function(e){ if(e.target===this) closeVideoModal(); });
+
+function getEmbedId(url){
+  try{
+    const u=new URL(url);
+    if(u.hostname.includes('youtu.be')) return u.pathname.slice(1).split('?')[0];
+    return u.searchParams.get('v')||'';
+  }catch(e){ return ''; }
+}
+
+function addVideoCard(){
+  const url   = document.getElementById('vUrl').value.trim();
+  const title = document.getElementById('vTitle').value.trim();
+  const msg   = document.getElementById('vMsg').value.trim();
+  const sign  = document.getElementById('vSign').value.trim();
+  const vid   = getEmbedId(url);
+  if(!vid){ document.getElementById('v-error').style.display='block'; return; }
+  document.getElementById('v-error').style.display='none';
+  const card=document.createElement('div');
+  card.className='video-card';
+  card.innerHTML=`
+    <div class="video-embed">
+      <iframe src="https://www.youtube.com/embed/${vid}" allowfullscreen loading="lazy"></iframe>
+    </div>
+    <div class="video-caption">
+      <span class="video-dedicate-label">♪ Dedicated to you ✦</span>
+      ${title?`<p class="video-song-title">${title}</p>`:''}
+      ${msg?`<p class="video-message">${msg.replace(/\n/g,'<br>')}</p>`:''}
+      ${sign?`<span class="video-sign">— ${sign}</span>`:''}
+    </div>
+  `;
+  document.getElementById('videos-grid').appendChild(card);
+  setTimeout(()=>card.classList.add('visible'),50);
+  closeVideoModal();
 }
 
 /* ════════════════════════════════════════
