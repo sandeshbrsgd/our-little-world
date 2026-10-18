@@ -25,6 +25,7 @@
   #password-screen.unlock-out{opacity:0;transform:scale(1.04);pointer-events:none;}
   #pw-stars{position:absolute;inset:0;pointer-events:none;z-index:0;}
   #pw-train-canvas{position:absolute;bottom:0;left:0;right:0;height:200px;width:100%;pointer-events:none;z-index:1;}
+  #pw-snow{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:5;}
   #password-screen::before{
     content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
     background:radial-gradient(ellipse 70% 50% at 50% 50%,rgba(107,91,158,0.2) 0%,transparent 70%);
@@ -130,6 +131,7 @@
   #site-content.revealed{display:block;}
 
   #starfield{position:fixed;inset:0;pointer-events:none;z-index:0;}
+  #snow-canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:3;}
   section{position:relative;z-index:2;}
 
   #hero{height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem;position:relative;}
@@ -254,19 +256,6 @@
     .tl-dot{grid-column:1;}
   }
 
-  #confetti-overlay{position:fixed;inset:0;background:var(--deep);z-index:990;opacity:1;transition:opacity 0.8s ease;pointer-events:none;}
-  #confetti-overlay.fade-out{opacity:0;}
-  #confetti-canvas{position:fixed;inset:0;pointer-events:none;z-index:999;}
-
-  #anni-toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);text-align:center;z-index:1000;pointer-events:none;transition:transform 0.55s cubic-bezier(0.34,1.56,0.64,1),opacity 0.6s;}
-  #anni-toast.show{transform:translate(-50%,-50%) scale(1);}
-  #anni-toast.hide{opacity:0;transform:translate(-50%,-55%) scale(0.9);}
-  #anni-toast .toast-small{font-family:'Cinzel',serif;font-size:clamp(0.45rem,2.5vw,0.75rem);letter-spacing:clamp(0.15em,1vw,0.45em);color:var(--gold);text-transform:uppercase;margin-bottom:clamp(0.4rem,1.5vw,0.8rem);opacity:0.85;white-space:nowrap;}
-  #anni-toast .toast-line1{font-family:'Sacramento',cursive;font-size:clamp(2.8rem,16vw,7rem);color:var(--star-white);line-height:0.95;text-shadow:0 0 60px rgba(200,169,110,0.5),0 0 120px rgba(107,91,158,0.3);display:block;}
-  #anni-toast .toast-line2{font-family:'Cinzel',serif;font-size:clamp(0.85rem,5vw,2rem);font-weight:600;letter-spacing:clamp(0.1em,1vw,0.25em);color:var(--gold);text-transform:uppercase;display:block;margin-top:0.2rem;text-shadow:0 0 30px rgba(200,169,110,0.4);}
-  #anni-toast .toast-line3{font-family:'Sacramento',cursive;font-size:clamp(1.8rem,10vw,3.5rem);color:var(--star-white);display:block;margin-top:0.1rem;line-height:1.1;text-shadow:0 0 40px rgba(200,169,110,0.4);}
-  #anni-toast .toast-hearts{font-size:clamp(0.9rem,3vw,1.2rem);margin-top:clamp(0.5rem,2vw,1rem);letter-spacing:clamp(0.3rem,2vw,0.6rem);color:#d4789a;display:block;animation:pulse-hearts 1.5s infinite;}
-
   #hero .hero-eyebrow,#hero .hero-title,#hero .hero-sub,#hero .hero-date,#hero .scroll-hint{animation:none!important;opacity:0;}
   #hero.revealed .hero-eyebrow{animation:fadeUp 1s 0.1s forwards!important;}
   #hero.revealed .hero-title{animation:fadeUp 1s 0.35s forwards!important;}
@@ -281,6 +270,7 @@
 <div id="password-screen">
   <canvas id="pw-stars"></canvas>
   <canvas id="pw-train-canvas"></canvas>
+  <canvas id="pw-snow"></canvas>
 
   <div class="pw-content">
     <div class="pw-route">
@@ -327,15 +317,7 @@
 <!-- MAIN SITE -->
 <div id="site-content">
   <canvas id="starfield"></canvas>
-  <div id="confetti-overlay"></div>
-  <canvas id="confetti-canvas"></canvas>
-  <div id="anni-toast">
-    <span class="toast-small">✦ &nbsp; A Whole Year Together &nbsp; ✦</span>
-    <span class="toast-line1">Happy</span>
-    <span class="toast-line2">1 Year</span>
-    <span class="toast-line3">Anniversary</span>
-    <span class="toast-hearts">❤ &nbsp; ❤ &nbsp; ❤</span>
-  </div>
+  <canvas id="snow-canvas"></canvas>
 
   <nav class="header-div">
     <a class="header-title" href="#hero">Home</a>
@@ -526,6 +508,67 @@
 
 <script>
 /* ════════════════════════════════════════
+   SNOWFALL (reusable)
+   density = flakes per 10,000 px² of screen
+════════════════════════════════════════ */
+function createSnow(canvas, opts){
+  const o = Object.assign({ density: 1.2, minR: 0.8, maxR: 2.8, minSpeed: 0.6, maxSpeed: 1.8, alpha: 0.85 }, opts||{});
+  const ctx = canvas.getContext('2d');
+  let flakes = [], running = true, w = 0, h = 0;
+
+  function rnd(a,b){ return a + Math.random()*(b-a); }
+  function makeFlake(randomY){
+    const r = rnd(o.minR, o.maxR);
+    const t = (r - o.minR) / (o.maxR - o.minR);   // bigger flakes fall faster & look closer
+    return {
+      x: Math.random()*w,
+      y: randomY ? Math.random()*h : -10,
+      r: r,
+      vy: o.minSpeed + t*(o.maxSpeed - o.minSpeed),
+      drift: rnd(-0.3, 0.3),
+      sway: rnd(0.5, 1.6),
+      swaySpeed: rnd(0.004, 0.015),
+      phase: rnd(0, Math.PI*2),
+      a: rnd(0.45, 1) * o.alpha
+    };
+  }
+  function resize(){
+    w = canvas.width  = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+    const n = Math.floor((w*h)/10000 * o.density);
+    flakes = [];
+    for(let i=0;i<n;i++) flakes.push(makeFlake(true));
+  }
+  function frame(){
+    if(!running) return;
+    ctx.clearRect(0,0,w,h);
+    for(let i=0;i<flakes.length;i++){
+      const f = flakes[i];
+      f.phase += f.swaySpeed;
+      f.x += f.drift + Math.sin(f.phase)*f.sway*0.4;
+      f.y += f.vy;
+      if(f.y > h + 10 || f.x < -20 || f.x > w + 20){
+        flakes[i] = makeFlake(false);
+        flakes[i].x = Math.random()*w;
+        continue;
+      }
+      ctx.beginPath();
+      ctx.arc(f.x, f.y, f.r, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(240,244,255,' + f.a + ')';
+      if(f.r > 2){ ctx.shadowColor = 'rgba(220,230,255,0.8)'; ctx.shadowBlur = 6; }
+      else { ctx.shadowBlur = 0; }
+      ctx.fill();
+    }
+    ctx.shadowBlur = 0;
+    requestAnimationFrame(frame);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+  requestAnimationFrame(frame);
+  return { stop: function(){ running = false; window.removeEventListener('resize', resize); ctx.clearRect(0,0,w,h); } };
+}
+
+/* ════════════════════════════════════════
    PASSWORD LOGIC
 ════════════════════════════════════════ */
 const CORRECT_PIN = '12042025';
@@ -536,6 +579,11 @@ const pwUnlocked = document.getElementById('pw-unlocked');
 const pwLockIcon = document.getElementById('pw-lock-icon');
 const pwTap      = document.getElementById('pw-tap');
 const pwScreen   = document.getElementById('password-screen');
+
+// Heavier snowfall on the password / train screen
+const pwSnow = createSnow(document.getElementById('pw-snow'), {
+  density: 2.2, minR: 0.9, maxR: 3.2, minSpeed: 0.7, maxSpeed: 2.2, alpha: 0.9
+});
 
 function focusPwInput(){ pwInput.focus(); }
 pwScreen.addEventListener('click', focusPwInput);
@@ -570,7 +618,7 @@ pwInput.addEventListener('input', ()=>{
         document.getElementById('site-content').classList.add('revealed');
         initSiteAnimations();
       }, 1800);
-      setTimeout(()=>{ pwScreen.remove(); }, 2800);
+      setTimeout(()=>{ pwSnow.stop(); pwScreen.remove(); }, 2800);
     } else {
       updateDots('error');
       pwError.classList.add('show');
@@ -904,37 +952,16 @@ function initSiteAnimations(){
   requestAnimationFrame(starLoop);
   window.addEventListener('resize',()=>{resizeStar();initStars();});
 
+  // Light snowfall on the main site
+  createSnow(document.getElementById('snow-canvas'), {
+    density: 0.55, minR: 0.7, maxR: 2.2, minSpeed: 0.45, maxSpeed: 1.2, alpha: 0.7
+  });
+
   const observer=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.15});
   document.querySelectorAll('.timeline-item,.letter-card,.gallery-card,.video-card').forEach(el=>observer.observe(el));
 
-  (function(){
-    const cc=document.getElementById('confetti-canvas');
-    const cx=cc.getContext('2d');
-    cc.width=innerWidth;cc.height=innerHeight;
-    window.addEventListener('resize',()=>{cc.width=innerWidth;cc.height=innerHeight;});
-    const COLORS=['#c8a96e','#f0eeff','#d4789a','#6b5b9e','#e8c99a','#f7d6e6','#a898d8','#ffecd2','#ffffff','#ffe0b2'];
-    const SHAPES=['rect','circle','star','heart','diamond'];
-    function rnd(a,b){return a+Math.random()*(b-a);}
-    class Piece{
-      constructor(burst){const bx=burst?burst.x:rnd(0.1,0.9)*cc.width,by=burst?burst.y:-20;this.x=bx+rnd(-100,100);this.y=by;this.vx=burst?rnd(-8,8):rnd(-3,3);this.vy=burst?rnd(-16,-5):rnd(1.5,5);this.gravity=0.2;this.size=rnd(5,13);this.color=COLORS[Math.floor(Math.random()*COLORS.length)];this.shape=SHAPES[Math.floor(Math.random()*SHAPES.length)];this.rotation=rnd(0,Math.PI*2);this.spin=rnd(-0.18,0.18);this.alpha=1;this.decay=rnd(0.007,0.013);this.wobble=rnd(0,Math.PI*2);this.wobbleSpeed=rnd(0.04,0.1);this.scaleX=1;this.scaleDir=rnd(-0.03,0.03);}
-      update(){this.wobble+=this.wobbleSpeed;this.vx+=Math.sin(this.wobble)*0.08;this.vy+=this.gravity;this.x+=this.vx;this.y+=this.vy;this.rotation+=this.spin;this.alpha-=this.decay;this.scaleX+=this.scaleDir;if(this.scaleX>1||this.scaleX<0.1)this.scaleDir*=-1;}
-      draw(){cx.save();cx.globalAlpha=Math.max(0,this.alpha);cx.translate(this.x,this.y);cx.rotate(this.rotation);cx.scale(this.scaleX,1);cx.fillStyle=this.color;const s=this.size;if(this.shape==='rect'){cx.fillRect(-s/2,-s*0.3,s,s*0.6);}else if(this.shape==='circle'){cx.beginPath();cx.arc(0,0,s/2,0,Math.PI*2);cx.fill();}else if(this.shape==='diamond'){cx.beginPath();cx.moveTo(0,-s/2);cx.lineTo(s/2,0);cx.lineTo(0,s/2);cx.lineTo(-s/2,0);cx.closePath();cx.fill();}else if(this.shape==='star'){let rot=-Math.PI/2,step=Math.PI/5;cx.beginPath();cx.moveTo(0,-s/2);for(let i=0;i<5;i++){cx.lineTo(Math.cos(rot)*s/2,Math.sin(rot)*s/2);rot+=step;cx.lineTo(Math.cos(rot)*s/4,Math.sin(rot)*s/4);rot+=step;}cx.closePath();cx.fill();}else{cx.beginPath();cx.moveTo(0,s*0.25);cx.bezierCurveTo(s*0.25,-s*0.25,s*0.8,s*0.1,0,s*0.8);cx.bezierCurveTo(-s*0.8,s*0.1,-s*0.25,-s*0.25,0,s*0.25);cx.closePath();cx.fill();}cx.restore();}
-      dead(){return this.alpha<=0||this.y>cc.height+60;}
-    }
-    let pieces=[],running=true,startTime=null;
-    const RAIN=5500;
-    function burst(x,y,n){for(let i=0;i<n;i++)pieces.push(new Piece({x,y}));}
-    function loop(ts){if(!startTime)startTime=ts;const el=ts-startTime;if(el<RAIN&&pieces.length<260){pieces.push(new Piece(null));if(el<300)pieces.push(new Piece(null));}cx.clearRect(0,0,cc.width,cc.height);pieces=pieces.filter(p=>!p.dead());pieces.forEach(p=>{p.update();p.draw();});if(running)requestAnimationFrame(loop);}
-    const toast=document.getElementById('anni-toast');
-    const overlay=document.getElementById('confetti-overlay');
-    setTimeout(()=>{toast.classList.add('show');},150);
-    setTimeout(()=>{burst(cc.width*.25,cc.height*.45,70);burst(cc.width*.75,cc.height*.45,70);burst(cc.width*.5,cc.height*.3,60);},300);
-    setTimeout(()=>{burst(cc.width*.15,cc.height*.6,40);burst(cc.width*.85,cc.height*.6,40);},900);
-    requestAnimationFrame(loop);
-    setTimeout(()=>{toast.classList.add('hide');},4000);
-    setTimeout(()=>{overlay.classList.add('fade-out');document.getElementById('hero').classList.add('revealed');},5200);
-    setTimeout(()=>{running=false;cx.clearRect(0,0,cc.width,cc.height);if(toast.parentNode)toast.remove();if(cc.parentNode)cc.remove();if(overlay.parentNode)overlay.remove();},7000);
-  })();
+  // Reveal the hero right away (the confetti / anniversary intro was removed)
+  document.getElementById('hero').classList.add('revealed');
 }
 
 /* ════════════════════════════════════════
